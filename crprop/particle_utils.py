@@ -12,6 +12,7 @@ except ImportError as e:
 numpy.set_printoptions(threshold=numpy.nan)
 
 # Particle Properties
+# Proton
 massMeV = 938.272013
 masseV = 938272013.0
 masskg = 1.67262161014e-27
@@ -21,8 +22,8 @@ chargeC = 1.602176462e-19
 outer_radius = 10.501
 inner_radius = 10.5
 norm_vel = 1
-#norm_vel = 200
-# HAWC Geocentric Coordinates (In Earth Radii)
+
+# HAWC Observatory geocentric coordinates (in Earth radii)
 hawcX = -0.1205300654
 hawcY = -0.939836962102
 hawcZ = 0.323942291206
@@ -60,7 +61,7 @@ def sph2cart(r, az, el):
     z = r * numpy.cos(el)
     return x, y, z
 
-def initial_buffers(num_particles):
+def initial_buffers(num_particles, Emin, Emax):
     np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_velocity = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_zmel = numpy.ndarray((num_particles, 4), dtype=numpy.float32)

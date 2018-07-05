@@ -1,7 +1,7 @@
 # Charged Particle in Geomagnetic Field Visualization
 
-This project (cr-geomag-prop) demonstrates a tool to visualize
-charge particle propagation through the Earth's magnetic field.
+This project (cr-geomag-prop) demonstrates a tool to visualize charge particle 
+propagation through the Earth's magnetic field using PyOpenCL and PyOpenGL.
 The following [link](https://www.youtube.com/watch?v=M-hRWb5rqL8&feature=youtu.be)
 shows a demonstration of this project's visualization of proton particles 
 interacting with the geomagnetic field.
@@ -33,6 +33,12 @@ The values shown in the line above are the defaults, thus users can do a first r
 via `python crprop/run.py`.
 
 ## Visualization
+Once the window opens, one can also use various mouse operations to change the scene.
+Holding the left mouse button allows the user to move the viewing position, while 
+holding down the right mouse button and moving up and down on the screen provides
+a zooming operation.
+The center mouse button provides translation of the origin about the screen.
+
 The colors of the particles are representative of their energy, and are correlated
 per the respective wavelengths.
 Thus, red corresponds to the lowest energies, while violet represents the highest values. 

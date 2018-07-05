@@ -5,6 +5,7 @@ try:
     import sys
     import numpy
     import argparse
+    from particle_utils import *
     import pyopencl as cl # OpenCL - GPU computing interface
     from pyopencl.tools import get_gl_sharing_context_properties
     from OpenGL.GL import * # OpenGL - GPU rendering interface
@@ -49,28 +50,10 @@ h = height
 
 frame = 0
 
-# Particle Properties
-massMeV = 938.272013
-masseV = 938272013.0
-masskg = 1.67262161014e-27
-chargeC = 1.602176462e-19
-
-# Set scale of positions and velocities
-outer_radius = 10.501
-inner_radius = 10.5
-norm_vel = 1
-#norm_vel = 200
-# HAWC Geocentric Coordinates (In Earth Radii)
-hawcX = -0.1205300654
-hawcY = -0.939836962102
-hawcZ = 0.323942291206
-
-# Cos ( Lowest Zenith )
-cosThetaMin = -1. #75 #0.707106781186548
-
 # Set the time step and pause functionality
 time_step = 0.0005
 time_pause_var = time_step
+
 # Set initial step to 0 to start paused
 time_step = 0
 
@@ -93,34 +76,6 @@ def check_positive_float(value):
          raise argparse.ArgumentTypeError("%s is an invalid positive float value" % value)
     return ivalue
 
-def rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
-    """
-    axis = numpy.asarray(axis)
-    theta = numpy.asarray(theta)
-    axis = axis/numpy.sqrt(numpy.dot(axis, axis))
-    a = numpy.cos(theta/2.0)
-    b, c, d = -axis*numpy.sin(theta/2.0)
-    aa, bb, cc, dd = a*a, b*b, c*c, d*d
-    bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
-    return numpy.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
-                     [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
-                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
-
-def rotate_about_axis(v, axis, theta):
-    if (numpy.array_equal(axis,numpy.zeros(len(axis)))):
-        return v
-    return numpy.dot(rotation_matrix(axis,theta),v)
-
-def sph2cart(r, az, el):
-    rsin_theta = r * numpy.sin(el)
-    x = rsin_theta * numpy.cos(az)
-    y = rsin_theta * numpy.sin(az)
-    z = r * numpy.cos(el)
-    return x, y, z
 
 def glut_window():
     global initRun
@@ -139,73 +94,6 @@ def glut_window():
     glutTimerFunc(10, on_timer, 10)  # Call draw every 30 ms
 
     return(window)
-
-def initial_buffers(num_particles):
-    np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
-    np_velocity = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
-    np_zmel = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
-
-    ## Test values
-    Energy_array = numpy.logspace(numpy.log10(Emin),numpy.log10(Emax),num_particles)
-    Gamma_array = Energy_array/masseV+1.
-    np_zmel[:,0] = chargeC
-    np_zmel[:,1] = masskg
-    np_zmel[:,2] = Energy_array
-    np_zmel[:,3] = Gamma_array
-
-    #r = (outer_radius-inner_radius)*numpy.random.random(num_particles)+inner_radius
-    ##phi = 0*numpy.pi/180*numpy.ones(num_particles)
-    #phi = 2*numpy.pi*numpy.random.random(num_particles)
-    ##theta = numpy.arccos(numpy.random.random(num_particles))
-    #theta = numpy.arccos(2*numpy.random.random(num_particles)-1)
-    ##theta = 45*numpy.pi/180*numpy.ones(num_particles)
-
-    #x,y,z = sph2cart(r, phi, theta)
-    #np_position[:,0] = x
-    #np_position[:,1] = y
-    #np_position[:,2] = z
-    #np_position[:,3] = 1.
-
-    #np_velocity[:,0] = norm_vel*(0.5-numpy.random.random_sample((num_particles, )))
-    #np_velocity[:,1] = norm_vel*(0.5-numpy.random.random_sample((num_particles, )))
-    #np_velocity[:,2] = norm_vel*(0.5-numpy.random.random_sample((num_particles, )))
-
-    # HAWC Values
-    np_position[:,0] = hawcX*3
-    np_position[:,1] = hawcY*3
-    np_position[:,2] = hawcZ*3
-    np_position[:,3] = 1.
-
-    vr = -norm_vel*numpy.ones(num_particles)
-    vphi = 2.*numpy.pi*numpy.random.random(num_particles)
-    #vphi = numpy.pi*numpy.random.random(num_particles)
-    vtheta = numpy.arccos(numpy.random.uniform(cosThetaMin,1,num_particles))
-
-    # Transform to Cartesian Coords
-    vx,vy,vz = sph2cart(vr, vphi, vtheta)
-    #vx,vy,vz = -hawcX,-hawcY,-hawcZ
-    #norm = numpy.sqrt(vx**2 + vy**2 + vz**2)
-    #vx *= norm_vel/norm 
-    #vy *= norm_vel/norm 
-    #vz *= norm_vel/norm 
-
-    np_velocity[:,0] = vx#+numpy.random.normal(0,numpy.sqrt(norm), len(np_velocity[:,0]))
-    np_velocity[:,1] = vy#+numpy.random.normal(0,numpy.sqrt(norm), len(np_velocity[:,0]))
-    np_velocity[:,2] = vz#+numpy.random.normal(0,numpy.sqrt(norm), len(np_velocity[:,0]))
-    np_velocity[:,3] = 0.
-
-    z_axis = numpy.zeros(3)
-    z_axis[2] = 1
-    rot_axis = numpy.zeros((num_particles,3))
-    for i in range(num_particles):
-        vel_i = np_velocity[i,0:3].copy()
-        pos_i = np_position[i,0:3].copy()
-        #rot_axis = numpy.cross(z_axis,pos_i)
-        #rot_angle = numpy.arccos(numpy.dot(z_axis,pos_i)/numpy.sqrt(numpy.dot(pos_i,pos_i)))
-        #vel_i = rotate_about_axis(vel_i,rot_axis,rot_angle)
-        np_velocity[i,0:3] = vel_i
-
-    return (np_position, np_velocity, np_zmel)
 
 def on_timer(t):
     glutTimerFunc(t, on_timer, t)
@@ -312,10 +200,15 @@ def on_display():
     global frame
     # Update or particle positions by calling the OpenCL kernel
     cl.enqueue_acquire_gl_objects(queue, [cl_gl_position, cl_gl_color])
-    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, cl_start_position, cl_start_velocity, numpy.float32(log_Emax), numpy.float32(Erange), numpy.float32(time_step))
+
+    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, 
+                  cl_start_position, cl_start_velocity, numpy.float32(log_Emax), 
+                  numpy.float32(Erange), numpy.float32(time_step))
+
     program.particle_prop(queue, (num_particles,), None, *(kernelargs))
     cl.enqueue_release_gl_objects(queue, [cl_gl_position, cl_gl_color])
     queue.finish()
+
     glFlush()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -429,7 +322,7 @@ if __name__=="__main__":
     window = glut_window()
    
     # Initialize the necessary particle information
-    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles)
+    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax)
     
     # Arrays for OpenGL bindings
     gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
@@ -461,7 +354,6 @@ if __name__=="__main__":
         sys.exit()
    
     # Get OpenCL code and compile the program
-    #cl_src_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'cl_src')
     f = open("%s/run_prop.cl"%cl_src_path,'r')
     fstr = "".join(f.readlines())
     program = cl.Program(context, fstr)
