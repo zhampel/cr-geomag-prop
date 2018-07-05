@@ -29,6 +29,8 @@ python crprop/run.py -n 1000 -e 1e7 -E 1e8
 to start the simulation, where the number of particles to simulate is given by `-n`,
 and the minimum and maximum particle energy in electronvolts (eV) are given by `-e` 
 and `-E`, respectively.
+The values shown in the line above are the defaults, thus users can do a first run 
+via `python crprop/run.py`.
 
 ## Visualization
 The colors of the particles are representative of their energy, and are correlated
