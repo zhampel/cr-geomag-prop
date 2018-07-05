@@ -1,6 +1,6 @@
-# Charged Particle B-Field Propagation Visualization
+# Charged Particle in Geomagnetic Field Visualization
 
-This project (cr-igrf-prop) demonstrates a tool to visualize
+This project (cr-geomag-prop) demonstrates a tool to visualize
 charge particle propagation through the Earth's magnetic field.
 The following [link](https://www.youtube.com/watch?v=M-hRWb5rqL8&feature=youtu.be)
 shows a demonstration of this project's visualization of proton particles 
