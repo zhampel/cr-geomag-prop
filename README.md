@@ -43,7 +43,7 @@ One must have ffmpeg installed on the system to make the movie.
 ## Installation of Installation
 The installation of the required packages can be a little bit tricky
 depending on the platform.
-For Linux machines, `pip install -r requirements.txt` should be enough
-to get started.
+For Linux machines, `pip install -r requirements.txt` or `make install`
+should be enough to get started.
 However, on Macs the process can be a bit more involved.
 More to be added soon...
