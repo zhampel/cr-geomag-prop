@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 try:
     import os
+    import sys
+    import numpy
     import argparse
     import pyopencl as cl # OpenCL - GPU computing interface
     from pyopencl.tools import get_gl_sharing_context_properties
@@ -9,8 +11,6 @@ try:
     from OpenGL.GLU import * # OpenGL tools (mipmaps, NURBS, perspective projection, shapes)
     from OpenGL.GLUT import * # OpenGL tool to make a visualization window
     from OpenGL.arrays import vbo 
-    import numpy # Number tools
-    import sys # System tools (path, modules, maxint)
     from PIL import Image
 
 except ImportError as e:
@@ -142,7 +142,6 @@ def glut_window():
 
 def initial_buffers(num_particles):
     np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
-    np_color = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_velocity = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_zmel = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
 
@@ -206,13 +205,7 @@ def initial_buffers(num_particles):
         #vel_i = rotate_about_axis(vel_i,rot_axis,rot_angle)
         np_velocity[i,0:3] = vel_i
 
-    # Arrays for OpenGL bindings
-    gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
-    gl_position.bind()
-    gl_color = vbo.VBO(data=np_color, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
-    gl_color.bind()
-
-    return (np_position, np_velocity, np_zmel, gl_position, gl_color)
+    return (np_position, np_velocity, np_zmel)
 
 def on_timer(t):
     glutTimerFunc(t, on_timer, t)
@@ -436,8 +429,15 @@ if __name__=="__main__":
     window = glut_window()
    
     # Initialize the necessary particle information
-    (np_position, np_velocity, np_zmel, gl_position, gl_color) = initial_buffers(num_particles)
-   
+    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles)
+    
+    # Arrays for OpenGL bindings
+    gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
+    gl_position.bind()
+    np_color = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
+    gl_color = vbo.VBO(data=np_color, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
+    gl_color.bind()
+
     # Define pyopencl context and queue based on available hardware
     platform = cl.get_platforms()[0]
     dev = platform.get_devices(device_type=cl.device_type.GPU)
