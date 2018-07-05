@@ -52,15 +52,17 @@ There are several available user options when running the simulation:
 - Save the frames to png files using the `s` key
 - Quit the simulation using the `q` or `Esc` key
 
-A BASH script named `crprop/make_mp4.sh` is provided to generate 
+A BASH script named `crprop/makemp4.sh` is provided to generate 
 an mp4 movie if saved frames are present in the `frames` directory.
 One must have ffmpeg installed on the system to make the movie.
 
 
 ## Installation of Required Software
-The installation of the required packages can be a little bit tricky
-depending on the platform.
-For Linux machines, `pip install -r requirements.txt` or `make install`
-should be enough to get started.
-However, on Macs the process can be a bit more involved.
-More to be added soon...
+The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
+depending on the platform, but occassionally it can be done via 
+`make install` or `pip install -r requirements.txt`.
+If this doesn't work, the best resource for preparing the PyOpenCL installation can 
+be found at Andreas Klockner's [website](https://wiki.tiker.net/PyOpenCL/Installation/).
+I have had success with building PyOpenGL from source, but in principle
+can be done via `pip` as shown [here](http://pyopengl.sourceforge.net/).
+Otherwise, only NumPy and Pillow are the remaining requirements for cr-geomag-prop.
