@@ -8,7 +8,7 @@ interacting with the geomagnetic field.
 
 To check-out the repo:
 ```
-git clone https://github.com/zhampel/cr-igrf-prop.git
+git clone https://github.com/zhampel/cr-geomag-prop.git
 ```
 
 
