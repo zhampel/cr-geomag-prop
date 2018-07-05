@@ -22,13 +22,22 @@ The second is the International Geomagnetic Reference Field
 
 
 # Usage
-To get started, one simply needs to run
+Upon installation of required dependencies, one simply needs to run
 ```
-python crprop/run.py
+python crprop/run.py -n 1000 -e 1e7 -E 1e8
 ```
+to start the simulation, where the number of particles to simulate is given by `-n`,
+and the minimum and maximum particle energy in electronvolts (eV) are given by `-e` 
+and `-E`, respectively.
 
 ## Visualization
-There are several available options when running the simulation:
+The colors of the particles are representative of their energy, and are correlated
+per the respective wavelengths.
+Thus, red corresponds to the lowest energies, while violet represents the highest values. 
+The wavelength-to-energy scaling is log-linear, thus color is proportional to the logarithm
+of the energy.
+
+There are several available user options when running the simulation:
 
 - Start/pause the propagation using the `p` key or the spacebar
 - Stop the rotation of the perspective using the `r` key
@@ -40,7 +49,7 @@ an mp4 movie if saved frames are present in the `frames` directory.
 One must have ffmpeg installed on the system to make the movie.
 
 
-## Installation of Installation
+## Installation of Required Software
 The installation of the required packages can be a little bit tricky
 depending on the platform.
 For Linux machines, `pip install -r requirements.txt` or `make install`

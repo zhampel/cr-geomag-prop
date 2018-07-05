@@ -1,16 +1,24 @@
 from __future__ import absolute_import
 
-import os
-import pyopencl as cl # OpenCL - GPU computing interface
+try:
+    import os
+    import argparse
+    import pyopencl as cl # OpenCL - GPU computing interface
+    from pyopencl.tools import get_gl_sharing_context_properties
+    from OpenGL.GL import * # OpenGL - GPU rendering interface
+    from OpenGL.GLU import * # OpenGL tools (mipmaps, NURBS, perspective projection, shapes)
+    from OpenGL.GLUT import * # OpenGL tool to make a visualization window
+    from OpenGL.arrays import vbo 
+    import numpy # Number tools
+    import sys # System tools (path, modules, maxint)
+    from PIL import Image
+
+except ImportError as e:
+    print(e)
+    raise ImportError
+
+# PyOpenCL memory flags
 mf = cl.mem_flags
-from pyopencl.tools import get_gl_sharing_context_properties
-from OpenGL.GL import * # OpenGL - GPU rendering interface
-from OpenGL.GLU import * # OpenGL tools (mipmaps, NURBS, perspective projection, shapes)
-from OpenGL.GLUT import * # OpenGL tool to make a visualization window
-from OpenGL.arrays import vbo 
-import numpy # Number tools
-import sys # System tools (path, modules, maxint)
-from PIL import Image
 
 numpy.set_printoptions(threshold=numpy.nan)
 
@@ -29,9 +37,6 @@ frame_prefix = os.path.join(frame_output_dir, 'particle')
 # OpenCL source code directory
 cl_src_path = os.path.join(run_dir, 'cl_src')
 
-# Number of test particles
-num_particles = 10000
-
 # Whether to save frames to pngs
 save_frames = False
 
@@ -45,17 +50,10 @@ h = height
 frame = 0
 
 # Particle Properties
-Emin = 1e7# eV 
-Emax = 1e8#1e12# eV 
 massMeV = 938.272013
 masseV = 938272013.0
 masskg = 1.67262161014e-27
 chargeC = 1.602176462e-19
-cL = 0.299792458
-emax = numpy.log10(Emax)
-erange = numpy.log10(Emax)-numpy.log10(Emin)
-
-Earth_radius = 6378137.
 
 # Set scale of positions and velocities
 outer_radius = 10.501
@@ -83,6 +81,17 @@ rotate = {'x': -55., 'y': 0., 'z': 45.}
 translate = {'x': 0., 'y': 0., 'z': 0.}
 initial_translate = {'x': 0., 'y': 0., 'z': -outer_radius}
 
+def check_positive_int(value):
+    ivalue = int(value)
+    if ivalue <= 0:
+         raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+    return ivalue
+
+def check_positive_float(value):
+    ivalue = float(value)
+    if ivalue <= 0:
+         raise argparse.ArgumentTypeError("%s is an invalid positive float value" % value)
+    return ivalue
 
 def rotation_matrix(axis, theta):
     """
@@ -299,9 +308,9 @@ def threeAxis(length):
     glPopMatrix()
 
 
-# Rotate camera too!!!
 def on_display():
 
+    # Rotate camera
     if rotate_perspective:
         dx = 0.3
         rotate['z'] += dx
@@ -310,7 +319,7 @@ def on_display():
     global frame
     # Update or particle positions by calling the OpenCL kernel
     cl.enqueue_acquire_gl_objects(queue, [cl_gl_position, cl_gl_color])
-    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, cl_start_position, cl_start_velocity, numpy.float32(emax), numpy.float32(erange), numpy.float32(time_step))
+    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, cl_start_position, cl_start_velocity, numpy.float32(log_Emax), numpy.float32(Erange), numpy.float32(time_step))
     program.particle_prop(queue, (num_particles,), None, *(kernelargs))
     cl.enqueue_release_gl_objects(queue, [cl_gl_position, cl_gl_color])
     queue.finish()
@@ -407,6 +416,21 @@ def printHelp():
 # MAIN
 #-----
 if __name__=="__main__":
+
+    global args
+    parser = argparse.ArgumentParser(description="Convolutional NN Training Script")
+    parser.add_argument("-n", "--num_particles", dest="num_particles", default=1000, type=check_positive_int, help="Number of particles to simulate")
+    parser.add_argument("-e", "--Emin", dest="Emin", default=1e7, type=check_positive_float, help="Minimum energy of particles (eV)")
+    parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
+    args = parser.parse_args()
+
+    # Get particle parameters
+    global num_particles, Emin, Emax, log_Emax, Erange
+    num_particles = args.num_particles
+    Emin = args.Emin
+    Emax = args.Emax
+    log_Emax = numpy.log10(Emax)
+    Erange = numpy.log10(Emax)-numpy.log10(Emin)
 
     # Start a new OpenGL window
     window = glut_window()
