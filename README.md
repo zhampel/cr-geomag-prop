@@ -7,7 +7,9 @@ shows a demonstration of this project's visualization of proton particles
 interacting with the geomagnetic field.
 
 To check-out the repo:
-`git clone https://github.com/zhampel/cr-igrf-prop.git`
+```
+git clone https://github.com/zhampel/cr-igrf-prop.git
+```
 
 
 
@@ -21,14 +23,17 @@ The second is the International Geomagnetic Reference Field
 
 # Usage
 To get started, one simply needs to run
-`python crprop/run.py`.
+```
+python crprop/run.py
+```
 
 ## Visualization
-There are several available options when running the simulation.
-To start/pause the propagation, use the `p` key or the spacebar.
-To stop the rotation of the perspective, use the `r` key.
-To save the frames to png files, use the `s` key.
-Finally, to quit the simulation, use the `q` or `Esc` key.
+There are several available options when running the simulation:
+
+- Start/pause the propagation using the `p` key or the spacebar
+- Stop the rotation of the perspective using the `r` key
+- Save the frames to png files using the `s` key
+- Quit the simulation using the `q` or `Esc` key
 
 A BASH script named `crprop/make_mp4.sh` is provided to generate 
 an mp4 movie if saved frames are present in the `frames` directory.
