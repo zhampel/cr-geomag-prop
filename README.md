@@ -3,8 +3,8 @@
 This project (cr-geomag-prop) demonstrates a tool to visualize charge particle 
 propagation through the Earth's magnetic field using PyOpenCL and PyOpenGL.
 The following [link](https://www.youtube.com/watch?v=M-hRWb5rqL8&feature=youtu.be)
-shows a demonstration of this project's visualization of proton particles 
-interacting with the geomagnetic field.
+shows a demonstration of this project's visualization of GeV proton particles 
+interacting with the geomagnetic field, while below is a screenshot from this simulation.
 
 To check-out the repo:
 ```
@@ -12,13 +12,13 @@ git clone https://github.com/zhampel/cr-geomag-prop.git
 ```
 
 
-Below is a screenshot of simulated GeV proton propagation.
 <p float="left">
   <img src="docs/images/screenshot.png" width="500" />
 </p>
 
 The Earth texture was obtained freely at the 
 [Planetary Pixel Emporium](http://planetpixelemporium.com/earth.html).
+
 
 
 ## B-Field Models
