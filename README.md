@@ -2,7 +2,7 @@
 
 This project (cr-geomag-prop) demonstrates a tool to visualize charge particle 
 propagation through the Earth's magnetic field using PyOpenCL and PyOpenGL.
-The following [link](https://www.youtube.com/watch?v=M-hRWb5rqL8&feature=youtu.be)
+The following [link](https://youtu.be/0FDwW1mo2Vk)
 shows a demonstration of this project's visualization of GeV proton particles 
 interacting with the geomagnetic field, while below is a screenshot from this simulation.
 
@@ -41,6 +41,11 @@ These diagrams were generated using the following MATLAB
   <img src="docs/images/igrf_isoclinic_diagram.png" width="400" />
 </p>
 
+Links showing short video demos of propagating protons in these fields are provided for the
+[IGRF](https://youtu.be/0FDwW1mo2Vk)
+model as well as the 
+[dipole](https://youtu.be/YA2j0FwJTsI)
+approximation.
 
 # Usage
 Upon installation of required dependencies, one simply needs to run
