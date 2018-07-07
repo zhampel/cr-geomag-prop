@@ -256,28 +256,6 @@ def on_display():
     glRotatef(rotate['z'], 0, 0, 1)
     glTranslatef(translate['x'], translate['y'], translate['z'])
     
-    # Render the particles
-    glEnable(GL_POINT_SMOOTH)
-    glPointSize(2)
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-    # Set up the VBOs
-    gl_color.bind()
-    glColorPointer(4, GL_FLOAT, 0, gl_color)
-    gl_position.bind()
-    glVertexPointer(4, GL_FLOAT, 0, gl_position)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_COLOR_ARRAY)
-
-    # Draw the VBOs
-    glDrawArrays(GL_POINTS, 0, num_particles)
-
-    glDisableClientState(GL_COLOR_ARRAY)
-    glDisableClientState(GL_VERTEX_ARRAY)
-
-    glDisable(GL_BLEND)
-    
     if (drawTexturedEarth):
         # Draw Earth
         global texture
@@ -285,7 +263,8 @@ def on_display():
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glColor4f(1.0,1.0,1.0,0.75)
+        glColor4f(1.0,1.0,1.0,1.0)
+        #glColor4f(1.0,1.0,1.0,0.75)
         quad = gluNewQuadric()
 
         glPushMatrix()
@@ -323,6 +302,28 @@ def on_display():
         glutSolidSphere(1.0, 32, 32)
         glDisable(GL_BLEND)
 
+    # Render the particles
+    glEnable(GL_POINT_SMOOTH)
+    glPointSize(2)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    # Set up the VBOs
+    gl_color.bind()
+    glColorPointer(4, GL_FLOAT, 0, gl_color)
+    gl_position.bind()
+    glVertexPointer(4, GL_FLOAT, 0, gl_position)
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+
+    # Draw the VBOs
+    glDrawArrays(GL_POINTS, 0, num_particles)
+
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_VERTEX_ARRAY)
+
+    glDisable(GL_BLEND)
+    
     glutSwapBuffers()
         
     # NOTE: the GL_RGB / GL_RGBA difference
