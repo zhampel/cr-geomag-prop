@@ -2,6 +2,8 @@
 # No saving output frames or movies
 *.png
 *.mp4
+!docs/images/*
+!crprop/textures/*
 
 # No DS_Store storage
 *.DS_Store

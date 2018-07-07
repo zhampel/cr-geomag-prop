@@ -12,6 +12,11 @@ git clone https://github.com/zhampel/cr-geomag-prop.git
 ```
 
 
+Below is a screenshot of simulated GeV proton propagation.
+![screen-shot](docs/images/screenshot.png)
+The Earth texture was obtained freely at the 
+[Planetary Pixel Emporium](http://planetpixelemporium.com/earth.html).
+
 
 ## B-Field Models
 There are two available models for estimating the geomagnetic field.
@@ -19,6 +24,16 @@ The first is the dipole approximation, where the axis of the field
 is tilted by 11.5 deg from the Earth's axis of rotation.
 The second is the International Geomagnetic Reference Field 
 ([IGRF](https://www.ngdc.noaa.gov/IAGA/vmod/igrf.html)).
+
+The two figures below show isoclinic digrams of these two models,
+the dipole being on the left, the IGRF on the right.
+These diagrams were generated using the following MATLAB
+[package](https://nl.mathworks.com/matlabcentral/fileexchange/34388-international-geomagnetic-reference-field--igrf--model).
+
+<p float="left">
+  <img src="docs/images/dipole_isoclinic_diagram.png" width="300" />
+  <img src="docs/images/igrf_isoclinic_diagram.png" width="300" />
+</p>
 
 
 # Usage

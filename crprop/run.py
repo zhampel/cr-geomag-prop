@@ -6,13 +6,17 @@ try:
     import numpy
     import argparse
     from particle_utils import *
+    
+    import pygame
+    from pygame.locals import *
+    from PIL import Image
+
     import pyopencl as cl # OpenCL - GPU computing interface
     from pyopencl.tools import get_gl_sharing_context_properties
     from OpenGL.GL import * # OpenGL - GPU rendering interface
     from OpenGL.GLU import * # OpenGL tools (mipmaps, NURBS, perspective projection, shapes)
     from OpenGL.GLUT import * # OpenGL tool to make a visualization window
     from OpenGL.arrays import vbo 
-    from PIL import Image
 
 except ImportError as e:
     print(e)
@@ -30,6 +34,11 @@ zoom = 60.
 
 # Path to run.py script
 run_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Boolean to draw a textured Earth
+drawTexturedEarth = True
+texture_dir = os.path.join(run_dir, 'textures')
+texture_file = os.path.join(texture_dir, 'earthmap1k.jpg')
 
 # Path to output frame pngs
 frame_output_dir = os.path.join(run_dir, 'frames')
@@ -77,6 +86,22 @@ def check_positive_float(value):
     return ivalue
 
 
+# Load a texture file to paint on sphere
+def load_texture(texture_url):
+    tex_id = glGenTextures(1)
+    tex = pygame.image.load(texture_url)
+
+    # Get image RGBA with flipped (True) ordering
+    tex_surface = pygame.image.tostring(tex, 'RGBA', True)
+    tex_width, tex_height = tex.get_size()
+
+    glBindTexture(GL_TEXTURE_2D, tex_id)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_surface)
+    glBindTexture(GL_TEXTURE_2D, 0)
+    return tex_id
+
 def glut_window():
     global initRun
     glutInit(sys.argv)
@@ -100,7 +125,9 @@ def on_timer(t):
     glutPostRedisplay()
 
 def on_key(*args):
-    global save_frames, time_step, rotate_perspective
+    global drawTexturedEarth
+    global rotate_perspective
+    global save_frames, time_step
 
     # Pause and restart
     if args[0] == ' ' or args[0] == 'p':
@@ -115,6 +142,10 @@ def on_key(*args):
         save_frames = not save_frames
         if not os.path.exists(frame_output_dir):
             os.makedirs(frame_output_dir)
+
+    # Toggle textured Earth and simple sphere
+    if args[0] == 'd':
+        drawTexturedEarth = not drawTexturedEarth
 
     # Exit program
     if args[0] == '\033' or args[0] == 'q':
@@ -197,7 +228,6 @@ def on_display():
         rotate['z'] += dx
 
     """Render the particles"""        
-    global frame
     # Update or particle positions by calling the OpenCL kernel
     cl.enqueue_acquire_gl_objects(queue, [cl_gl_position, cl_gl_color])
 
@@ -248,25 +278,57 @@ def on_display():
 
     glDisable(GL_BLEND)
     
-    # Draw Axes
-    threeAxis(1.5)
-    #glClear(GL_COLOR_BUFFER_BIT)
+    if (drawTexturedEarth):
+        # Draw Earth
+        global texture
+        glDepthMask(GL_FALSE)
 
-    # Draw Transparent Earth
-    glEnable(GL_BLEND)
-    #glBlendFunc (GL_SRC_ALPHA, GL_ONE) 
-    #glBlendFunc(GL_ONE, GL_ONE_MINUS_DST_ALPHA)
-    #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA)
-    glColor4f(0.0,0.0,1.0, 0.15)
-    glutSolidSphere(1.0,32,32)
-    glDisable(GL_BLEND)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glColor4f(1.0,1.0,1.0,0.75)
+        quad = gluNewQuadric()
+
+        glPushMatrix()
+
+        # Only front of sphere appears
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK)
+
+        # Bind texture to quadric
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, texture)
+        gluQuadricTexture(quad, True)
+
+        # Rotate Earth to align with HAWC longitude
+        e_rot = 180./numpy.pi*numpy.arctan(hawcY/hawcX)
+        glRotated(e_rot, 0.0, 0.0, 1.0)
+
+        # Define sphere as quadric surface
+        gluSphere(quad, 1.0, 100, 100)
+
+        glDisable(GL_BLEND)
+        glDisable(GL_CULL_FACE)
+        glDepthMask(GL_TRUE)
+
+        glPopMatrix()
+
+    
+    else:
+        # Draw a blue sphere
+        # Draw xyz axes
+        threeAxis(1.5)
+        # Draw Transparent Earth
+        glEnable(GL_BLEND)
+        glColor4f(0.0, 0.0, 1.0, 0.15)
+        glutSolidSphere(1.0, 32, 32)
+        glDisable(GL_BLEND)
 
     glutSwapBuffers()
         
     # NOTE: the GL_RGB / GL_RGBA difference
     if save_frames:
+        global frame
         png_file_write(frame_prefix, frame, glReadPixels( 0,0, w, h, GL_RGBA, GL_UNSIGNED_BYTE))
-        #png_file_write("frames/particles", frame, glReadPixels( 0,0, w, h, GL_RGBA, GL_UNSIGNED_BYTE))
         frame += 1
 
 
@@ -320,6 +382,9 @@ if __name__=="__main__":
 
     # Start a new OpenGL window
     window = glut_window()
+
+    # Preload texture once
+    texture = load_texture(texture_file)
    
     # Initialize the necessary particle information
     (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax)
