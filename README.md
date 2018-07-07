@@ -26,10 +26,13 @@ There are two available models for estimating the geomagnetic field.
 The first is the dipole approximation, where the axis of the field
 is tilted by 11.5 deg from the Earth's axis of rotation.
 The second is the International Geomagnetic Reference Field 
-([IGRF](https://www.ngdc.noaa.gov/IAGA/vmod/igrf.html)).
+([IGRF](https://www.ngdc.noaa.gov/IAGA/vmod/igrf.html)),
+a best fit model to satellite borne and ground based sensor measurements
+using a 13-order expansion of Legendre functions.
 
 The two figures below show isoclinic digrams of these two models,
-the dipole being on the left, the IGRF on the right.
+the dipole being on the left, the IGRF on the right, where
+deviation of IGRF from the symmetric dipole approximation is clearly visible.
 These diagrams were generated using the following MATLAB
 [package](https://nl.mathworks.com/matlabcentral/fileexchange/34388-international-geomagnetic-reference-field--igrf--model).
 
