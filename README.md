@@ -71,6 +71,7 @@ There are several available user options when running the simulation:
 - Start/pause the propagation using the `p` key or the spacebar
 - Stop the rotation of the perspective using the `r` key
 - Save the frames to png files using the `s` key
+- Toggle between a textured Earth and a simple sphere using the `t` key
 - Quit the simulation using the `q` or `Esc` key
 
 A BASH script named `crprop/makemp4.sh` is provided to generate 

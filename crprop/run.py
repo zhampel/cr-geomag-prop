@@ -144,7 +144,7 @@ def on_key(*args):
             os.makedirs(frame_output_dir)
 
     # Toggle textured Earth and simple sphere
-    if args[0] == 'd':
+    if args[0] == 't':
         drawTexturedEarth = not drawTexturedEarth
 
     # Exit program
