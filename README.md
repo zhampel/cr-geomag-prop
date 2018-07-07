@@ -14,6 +14,10 @@ git clone https://github.com/zhampel/cr-geomag-prop.git
 
 Below is a screenshot of simulated GeV proton propagation.
 ![screen-shot](docs/images/screenshot.png)
+<p float="left">
+  <img src="docs/images/screenshot.png" width="500" />
+</p>
+
 The Earth texture was obtained freely at the 
 [Planetary Pixel Emporium](http://planetpixelemporium.com/earth.html).
 
@@ -31,8 +35,8 @@ These diagrams were generated using the following MATLAB
 [package](https://nl.mathworks.com/matlabcentral/fileexchange/34388-international-geomagnetic-reference-field--igrf--model).
 
 <p float="left">
-  <img src="docs/images/dipole_isoclinic_diagram.png" width="300" />
-  <img src="docs/images/igrf_isoclinic_diagram.png" width="300" />
+  <img src="docs/images/dipole_isoclinic_diagram.png" width="400" />
+  <img src="docs/images/igrf_isoclinic_diagram.png" width="400" />
 </p>
 
 
