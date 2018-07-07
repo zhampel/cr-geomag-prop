@@ -68,13 +68,13 @@ of the energy.
 
 There are several available user options when running the simulation:
 
-- Start/pause the propagation using the `p` key or the spacebar
-- Stop the rotation of the perspective using the `r` key
-- Save the frames to png files using the `s` key
-- Toggle between a textured Earth and a simple sphere using the `t` key
-- Quit the simulation using the `q` or `Esc` key
+- `p` key or spacebar: start/pause the propagation
+- `r` key: start/stop the rotation of the perspective
+- `s` key: save the frames to png files
+- `t` key: toggle between a textured Earth and a simple sphere
+- `q` or `Esc` keys: quit the simulation
 
-A BASH script named `crprop/makemp4.sh` is provided to generate 
+A BASH script named `crprop/make_mp4.sh` is provided to generate 
 an mp4 movie if saved frames are present in the `frames` directory.
 One must have ffmpeg installed on the system to make the movie.
 
@@ -87,4 +87,4 @@ If this doesn't work, the best resource for preparing the PyOpenCL installation 
 be found at Andreas Klockner's [website](https://wiki.tiker.net/PyOpenCL/Installation/).
 I have had success with building PyOpenGL from source, but in principle
 can be done via `pip` as shown [here](http://pyopengl.sourceforge.net/).
-Otherwise, only NumPy and Pillow are the remaining requirements for cr-geomag-prop.
+Otherwise, NumPy, Pillow, and PyGame are the remaining requirements for cr-geomag-prop.
