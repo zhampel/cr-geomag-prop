@@ -30,7 +30,7 @@ The second is the International Geomagnetic Reference Field
 a best fit model to satellite borne and ground based sensor measurements
 using a 13-order expansion of Legendre functions.
 
-The two figures below show isoclinic digrams of these two models,
+The two figures below show isoclinic diagrams of these two models,
 the dipole being on the left, the IGRF on the right, where
 deviation of IGRF from the symmetric dipole approximation is clearly visible.
 These diagrams were generated using the following MATLAB
@@ -67,9 +67,9 @@ The center mouse button provides translation of the origin about the screen.
 
 The colors of the particles are representative of their energy, and are correlated
 per the respective wavelengths.
-Thus, red corresponds to the lowest energies, while violet represents the highest values. 
-The wavelength-to-energy scaling is log-linear, thus color is proportional to the logarithm
-of the energy.
+Red corresponds to the lowest energies, while violet represents the highest values. 
+The color-to-energy scaling is log-linear, thus color wavelength is proportional 
+to the logarithm of the particle energy.
 
 There are several available user options when running the simulation:
 
@@ -86,8 +86,7 @@ One must have ffmpeg installed on the system to make the movie.
 
 ## Installation of Required Software
 The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
-depending on the platform, but occassionally it can be done via 
-`make install` or `pip install -r requirements.txt`.
+depending on the platform, but may be done via `make install` or `pip install -r requirements.txt`.
 If this doesn't work, the best resource for preparing the PyOpenCL installation can 
 be found at Andreas Klockner's [website](https://wiki.tiker.net/PyOpenCL/Installation/).
 I have had success with building PyOpenGL from source, but in principle
