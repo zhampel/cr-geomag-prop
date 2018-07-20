@@ -8,10 +8,10 @@ from shutil import rmtree
 from setuptools import setup, find_packages, Command
 
 NAME = 'crprop'
-DESCRIPTION = 'A tool for visualizing cosmic rays propagating through the Earths magnetic field',
+DESCRIPTION = 'A tool for visualizing cosmic rays propagating through the geomagnetic field',
 MAINTAINER = 'Zigfried Hampel-Arias'
 MAINTAINER_EMAIL = 'zhampel@gmail.com'
-URL = 'https://github.com/zhampel/cr-igrf-prop'
+URL = 'https://github.com/zhampel/cr-geomag-prop'
 LICENSE = 'MIT'
 
 

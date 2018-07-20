@@ -85,6 +85,7 @@ One must have ffmpeg installed on the system to make the movie.
 
 
 ## Installation of Required Software
+Personally, I've only successfully run using Python2.7, testing on Python3.0 is forthcoming.
 The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
 depending on the platform, but may be done via `make install` or `pip install -r requirements.txt`.
 If this doesn't work, the best resource for preparing the PyOpenCL installation can 
