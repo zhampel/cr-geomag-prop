@@ -371,6 +371,8 @@ if __name__=="__main__":
     parser.add_argument("-n", "--num_particles", dest="num_particles", default=1000, type=check_positive_int, help="Number of particles to simulate")
     parser.add_argument("-e", "--Emin", dest="Emin", default=1e7, type=check_positive_float, help="Minimum energy of particles (eV)")
     parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
+    parser.add_argument("-a", "--alpha", dest="alpha", type=float,
+                        help="Option energy spectral index. If given, weight the energy distribution of events by E^-alpha.")
     args = parser.parse_args()
 
     # Get particle parameters
@@ -388,7 +390,7 @@ if __name__=="__main__":
     texture = load_texture(texture_file)
    
     # Initialize the necessary particle information
-    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax)
+    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax, alpha=args.alpha)
     
     # Arrays for OpenGL bindings
     gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
