@@ -61,13 +61,18 @@ def sph2cart(r, az, el):
     z = r * numpy.cos(el)
     return x, y, z
 
-def initial_buffers(num_particles, Emin, Emax):
+def initial_buffers(num_particles, Emin, Emax, alpha=None):
     np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_velocity = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_zmel = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
 
     ## Test values
-    Energy_array = numpy.logspace(numpy.log10(Emin),numpy.log10(Emax),num_particles)
+    if alpha:
+        E = 10**numpy.arange(numpy.log10(Emin), numpy.log10(Emax), 0.01)
+        weights = E**-alpha
+        Energy_array = numpy.random.choice(E, size=num_particles, p=weights/weights.sum())
+    else:
+        Energy_array = numpy.logspace(numpy.log10(Emin),numpy.log10(Emax),num_particles)
     Gamma_array = Energy_array/masseV+1.
     np_zmel[:,0] = chargeC
     np_zmel[:,1] = masskg
