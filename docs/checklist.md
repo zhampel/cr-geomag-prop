@@ -14,6 +14,7 @@ Things I would like to implement in cr-geomag-prop
 ### Functionality
 - [ ] ability to choose field model
 - [ ] ability to choose EOM integrator
+- [x] ability to select power law energy distribution
 - [x] pas fini (incomplete) 
 - [ ] fini! (complete)
 
