@@ -37,29 +37,131 @@ def rotation_matrix(axis, theta):
     Return the rotation matrix associated with counterclockwise rotation about
     the given axis by theta radians.
     http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
+
+    Parameters
+    ----------
+    axis       : array_like
+                 Axis about which to rotate
+    theta      : float
+                 Rotation angle in radians
+
+    Returns
+    -------
+    rot_matrix : 2d_array_like
+                 Rotation matrix
+
+    Example
+    -------
+    >>> from particle_utils import rotation_matrix
+    >>> import numpy
+    >>> axis = [0,0,1] # z-axis
+    >>> theta = numpy.radians(45) # 45 degrees in radians
+    >>> rotation_matrix(axis, theta)
+    array([[ 0.70710678, -0.70710678,  0.        ],
+           [ 0.70710678,  0.70710678,  0.        ],
+           [ 0.        ,  0.        ,  1.        ]])
     """
+    # Ensure axis is a normalized vector
     axis = numpy.asarray(axis)
-    theta = numpy.asarray(theta)
     axis = axis/numpy.sqrt(numpy.dot(axis, axis))
+    theta = numpy.asarray(theta)
+
+    # Coefficients used to define rotation matrix
     a = numpy.cos(theta/2.0)
     b, c, d = -axis*numpy.sin(theta/2.0)
     aa, bb, cc, dd = a*a, b*b, c*c, d*d
     bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
-    return numpy.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
-                     [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
-                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
+
+    # Form rotation matrix
+    rot_matrix = numpy.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
+                              [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
+                              [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
+
+    return rot_matrix
+
 
 def rotate_about_axis(v, axis, theta):
+    """
+    Return the rotated vector v after rotation about axis by theta radians
+
+    Parameters
+    ----------
+    v          : array_like
+                 Axis about which to rotate
+    axis       : array_like
+                 Axis about which to rotate
+    theta      : float
+                 Rotation angle in radians
+
+    Returns
+    -------
+    rot_matrix : 2d_array_like
+                 Rotation matrix
+
+    Example
+    -------
+    >>> from particle_utils import rotate_about_axis
+    >>> import numpy
+    >>> axis = [0,0,1] # z-axis
+    >>> theta = numpy.radians(45) # 45 degrees in radians
+    >>> v = [1,0,0] # vector to rotate
+    >>> rotate_about_axis(v, axis, theta)
+    array([ 0.70710678,  0.70710678,  0.        ])
+    >>> v = [1,1,1] # vector to rotate
+    >>> rotate_about_axis(v, axis, theta)
+    array([ -1.11022302e-16,   1.41421356e+00,   1.00000000e+00])
+    """
+    # If axis is zero vector, return unrotated v
+    # (can't normalize in ``rotation_matrix``)
     if (numpy.array_equal(axis,numpy.zeros(len(axis)))):
         return v
-    return numpy.dot(rotation_matrix(axis,theta),v)
+
+    # Rotate v using ``rotation_matrix`` call
+    rot_v = numpy.dot(rotation_matrix(axis,theta),v)
+
+    return rot_v
+
 
 def sph2cart(r, az, el):
+    """
+    Return the Cartesian values of elements defined in spherical coordinates
+
+    Parameters
+    ----------
+    r  : float
+         Radius value
+    az : float
+         azimuth value in radians
+    el : float
+         theta value in radians
+
+
+    Returns
+    -------
+    x  : float
+         x value
+    y  : float
+         y value
+    z  : float
+         z value
+
+    Example
+    -------
+    >>> from particle_utils import sph2cart
+    >>> import numpy
+    >>> r, az, el = 1, numpy.radians(45), numpy.radians(45)
+    >>> sph2cart(r, az, el)
+    (0.5, 0.49999999999999989, 0.70710678118654757)
+    >>> r, az, el = 1, numpy.radians(45), 0
+    >>> sph2cart(r, az, el)
+    (0.0, 0.0, 1.0)
+    """
     rsin_theta = r * numpy.sin(el)
     x = rsin_theta * numpy.cos(az)
     y = rsin_theta * numpy.sin(az)
     z = r * numpy.cos(el)
     return x, y, z
+
 
 def initial_buffers(num_particles, Emin, Emax, alpha=None):
     np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)

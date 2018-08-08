@@ -9,7 +9,8 @@
 
 
 // Propagation Step function
-static void Propagate(float time_step, 
+static void Propagate(float time_step,
+                      int integrator,
                       struct particle_struct *particle, 
                       float4 startp, float4 startv, 
                       struct igrf_struct *coeff_struct)
@@ -18,7 +19,6 @@ static void Propagate(float time_step,
     float life = vec_three_Mag(particle->pos);
 
     // If particle hits Earth or get too far away, respawn
-    //bool death = (life<=E_r_m || life>60.f*E_r_m);
     bool death = (life<=E_r_m || life>10.f*E_r_m);
     if (death)
     {
@@ -28,11 +28,14 @@ static void Propagate(float time_step,
         life = vec_three_Mag(startp); 
     }
 
-    //PropStepRK4(time_step,particle);
-    //PropStepLin(time_step,particle);
-
-    PropStepBoris(time_step,particle,coeff_struct);
-    //PropStepAdaptBoris(time_step,particle,coeff_struct);
+    if (integrator == 1)
+        PropStepEuler(time_step, particle);
+    else if (integrator == 2)
+        PropStepRK4(time_step, particle);
+    else if (integrator == 3)
+        PropStepBoris(time_step, particle, coeff_struct);
+    else if (integrator == 4)
+        PropStepAdaptBoris(time_step, particle, coeff_struct);
 }
 
 
@@ -43,12 +46,19 @@ __kernel void particle_prop(__global float4* position,
                             __global float4* zmel,
                             __global float4* start_position,
                             __global float4* start_velocity,
-                            float maxE,
-                            float range,
-                            float time_step)
+                            float4 options)
+                            //float maxE,
+                            //float range,
+                            //float time_step)
 {
     // Get this particles address on GPU
     unsigned int gid = get_global_id(0);
+
+    // Global runtime options
+    float time_step = options.x;
+    float maxE = options.y;
+    float range = options.z;
+    int eom_integrator = int(options.w);
 
     // Grab position and direction vectors
     float4 p = vec_scale(E_r_m,position[gid]);
@@ -74,7 +84,7 @@ __kernel void particle_prop(__global float4* position,
     SetCoeffIndexScheme(&coeff_struct);
 
     // Propagate in time via stepper function of choice
-    Propagate(time_step, &particle, start_position[gid], start_velocity[gid], &coeff_struct);
+    Propagate(time_step, eom_integrator, &particle, start_position[gid], start_velocity[gid], &coeff_struct);
 
     // Grab position and velocity, ensuring to scale properly for viewing
     p = particle.pos;

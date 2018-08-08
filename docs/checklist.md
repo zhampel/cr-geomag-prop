@@ -7,13 +7,14 @@ Things I would like to implement in cr-geomag-prop
 - [x] Visualization
 
 ### Testing Suite
-- [ ] test major functions
+- [ ] test major Python functions
 - [x] pas fini (incomplete) 
 - [ ] fini! (complete)
 
 ### Functionality
+- [ ] ability to have multiple species
 - [ ] ability to choose field model
-- [ ] ability to choose EOM integrator
+- [x] ability to choose EOM integrator
 - [x] ability to select power law energy distribution
 - [x] pas fini (incomplete) 
 - [ ] fini! (complete)

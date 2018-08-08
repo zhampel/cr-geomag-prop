@@ -22,7 +22,7 @@ static float4 GetUniformField(void)
 
 // Dipole Approx from AERIE Code:
 // aerie/trunk/src/astro-service/src/GeoDipoleService.cc
-static float4 GetField(float4 pos)
+static float4 GetDipoleField(float4 pos)
 {
     float r = vec_three_Mag(pos)/E_r_m; //EquatorialRadius (meters)
     float B0 = 31.2 * 1e-6; // micro Tesla

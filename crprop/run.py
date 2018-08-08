@@ -66,6 +66,12 @@ time_pause_var = time_step
 # Set initial step to 0 to start paused
 time_step = 0
 
+# Dictionary for choosing EOM integrators
+eom_dict = {'euler'   : 1,
+            'rk4'      : 2,
+            'boris'    : 3,
+            'adaboris' : 4}
+
 # Mouse functionality
 mouse_down = False
 mouse_old = {'x': 0., 'y': 0.}
@@ -103,7 +109,11 @@ def load_texture(texture_url):
     return tex_id
 
 def glut_window():
+
     global initRun
+
+    printHelp()
+
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(width, height)
@@ -127,11 +137,12 @@ def on_timer(t):
 def on_key(*args):
     global drawTexturedEarth
     global rotate_perspective
-    global save_frames, time_step
+    global save_frames, time_step, run_options
 
     # Pause and restart
     if args[0] == ' ' or args[0] == 'p':
         time_step = time_pause_var-time_step
+        run_options[0] = time_step
 
     # Rotate vieweing perspective
     if args[0] == 'r':
@@ -232,8 +243,9 @@ def on_display():
     cl.enqueue_acquire_gl_objects(queue, [cl_gl_position, cl_gl_color])
 
     kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, 
-                  cl_start_position, cl_start_velocity, numpy.float32(log_Emax), 
-                  numpy.float32(Erange), numpy.float32(time_step))
+                  cl_start_position, cl_start_velocity, 
+                  run_options)
+                  #numpy.float32(log_Emax), numpy.float32(Erange), numpy.float32(time_step))
 
     program.particle_prop(queue, (num_particles,), None, *(kernelargs))
     cl.enqueue_release_gl_objects(queue, [cl_gl_position, cl_gl_color])
@@ -355,9 +367,11 @@ def printHelp():
           Right Mouse Button:       - zoom in and out of scene\n
           
           Keys
-            p:                      - start or pause the program\n
-            q,Esc:                  - exit the program\n
+            p, spacebar:            - start or pause the program\n
+            q, Esc:                 - exit the program\n
+            r:                      - start/stop rotation of viewing perspective\n
             s:                      - save frames to file (default is no save)\n
+            t:                      - toggle between a textured Earth and a simple sphere\n
           ------------------------------------------------------------------------------\n
           \n"""
 
@@ -373,15 +387,20 @@ if __name__=="__main__":
     parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
     parser.add_argument("-a", "--alpha", dest="alpha", type=float,
                         help="Optional energy spectral index. If given, weight the energy distribution of events by E^-alpha.")
+    parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris', 
+                        help="Stepper function to integrate equations of motion. Default: boris. Options: euler, rk4, boris, adaboris")
     args = parser.parse_args()
 
     # Get particle parameters
-    global num_particles, Emin, Emax, log_Emax, Erange
+    global num_particles, Emin, Emax, log_Emax, Erange, run_options
     num_particles = args.num_particles
     Emin = args.Emin
     Emax = args.Emax
     log_Emax = numpy.log10(Emax)
     Erange = numpy.log10(Emax)-numpy.log10(Emin)
+    eom_integrator = eom_dict[args.eom_step.lower()]
+
+    run_options = numpy.array([time_step, log_Emax, Erange, eom_integrator], dtype=numpy.float32)
 
     # Start a new OpenGL window
     window = glut_window()
