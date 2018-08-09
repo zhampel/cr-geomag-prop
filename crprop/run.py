@@ -387,6 +387,12 @@ if __name__=="__main__":
     parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
     parser.add_argument("-a", "--alpha", dest="alpha", type=float,
                         help="Optional energy spectral index. If given, weight the energy distribution of events by E^-alpha.")
+    parser.add_argument("--lat", dest="lat", type=float, default=18.99,
+                        help="Geodetic latitude of starting particle position in degrees.")
+    parser.add_argument("--lon", dest="lon", type=float, default=-97.308,
+                        help="Geodetic longitude of starting particle position in degrees.")
+    parser.add_argument("--height", dest="height", type=float, default=3,
+                        help="Height of starting particle position in Earth radii. 1 is ground level.")
     parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris', 
                         help="Stepper function to integrate equations of motion. Default: boris. Options: euler, rk4, boris, adaboris")
     args = parser.parse_args()
@@ -409,7 +415,8 @@ if __name__=="__main__":
     texture = load_texture(texture_file)
    
     # Initialize the necessary particle information
-    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax, alpha=args.alpha)
+    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax, alpha=args.alpha,
+                                                          lat=args.lat, lon=args.lon, height=args.height)
     
     # Arrays for OpenGL bindings
     gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
