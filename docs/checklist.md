@@ -12,6 +12,10 @@ Things I would like to implement in cr-geomag-prop
 - [ ] fini! (complete)
 
 ### Functionality
+- [ ] backtracing propagation capability
+- [ ] defining starting pos and vel distributions
+- [ ] add astropy functionality
+- [ ] configuration file option
 - [ ] ability to have multiple species
 - [ ] ability to choose field model
 - [x] ability to choose EOM integrator
