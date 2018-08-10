@@ -4,6 +4,8 @@ try:
     import os
     import sys
     import numpy
+    import astropy.coordinates as coords
+    from astropy import units as u
 
 except ImportError as e:
     print(e)
@@ -162,8 +164,41 @@ def sph2cart(r, az, el):
     z = r * numpy.cos(el)
     return x, y, z
 
+def geodetic_to_geocentric(lat, lon, height=1):
+    """
+    Convert Geodetic direction to Geocentric positional coordinates.
 
-def initial_buffers(num_particles, Emin, Emax, alpha=None):
+    Parameters
+    ----------
+    lat : float
+          geodetic latitude(s) in degrees
+    lon : float
+          geodetic longitude(s) in degrees
+    height : float, optional
+             height above the Earth in Earth radii
+
+    Returns
+    -------
+    x : float
+        geocentric x value(s) in Earth radii
+    y : float
+        geocentric y value(s) in Earth radii
+    z : float
+        geocentric z value(s) in Earth radii
+    
+    """
+
+    r = 6.37781e6 # radius of the Earth
+    e_pos = coords.EarthLocation.from_geodetic(lat=lat*u.deg, lon=lon*u.deg,
+                                               height=height*r*u.meter)
+    x = e_pos.x.value/r
+    y = e_pos.y.value/r
+    z = e_pos.z.value/r
+    
+    return x, y, z
+    
+
+def initial_buffers(num_particles, Emin, Emax, lat, lon, height, alpha=None):
     np_position = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_velocity = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
     np_zmel = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
@@ -188,10 +223,8 @@ def initial_buffers(num_particles, Emin, Emax, alpha=None):
     #theta = numpy.arccos(2*numpy.random.random(num_particles)-1)
     ##theta = 45*numpy.pi/180*numpy.ones(num_particles)
 
-    # HAWC Values
-    np_position[:,0] = hawcX*3
-    np_position[:,1] = hawcY*3
-    np_position[:,2] = hawcZ*3
+    # Assign starting particle positions.
+    np_position[:,0:3] = geodetic_to_geocentric(lat, lon, height)
     np_position[:,3] = 1.
 
     vr = -norm_vel*numpy.ones(num_particles)
