@@ -3,10 +3,10 @@ from __future__ import absolute_import
 try:
     import os
     import sys
-    import numpy
+    import numpy as np
     import argparse
     from particle_utils import *
-    
+
     import pygame
     from pygame.locals import *
     from PIL import Image
@@ -16,7 +16,7 @@ try:
     from OpenGL.GL import * # OpenGL - GPU rendering interface
     from OpenGL.GLU import * # OpenGL tools (mipmaps, NURBS, perspective projection, shapes)
     from OpenGL.GLUT import * # OpenGL tool to make a visualization window
-    from OpenGL.arrays import vbo 
+    from OpenGL.arrays import vbo
 
 except ImportError as e:
     print(e)
@@ -25,7 +25,7 @@ except ImportError as e:
 # PyOpenCL memory flags
 mf = cl.mem_flags
 
-numpy.set_printoptions(threshold=numpy.nan)
+np.set_printoptions(threshold=np.nan)
 
 # OpenGL window dimensions and perspective
 width = 720
@@ -213,9 +213,9 @@ def axis(length):
     glTranslated(0,0,length)
     glutWireCone(0.04,0.2, 12, 9)
     glPopMatrix()
-    
+
 def threeAxis(length):
-    """ Draws an X, Y and Z-axis """ 
+    """ Draws an X, Y and Z-axis """
     glPushMatrix()
     # Z-axis
     glColor3f(1.0,0.0,0.0)
@@ -238,14 +238,14 @@ def on_display():
         dx = 0.3
         rotate['z'] += dx
 
-    """Render the particles"""        
+    """Render the particles"""
     # Update or particle positions by calling the OpenCL kernel
     cl.enqueue_acquire_gl_objects(queue, [cl_gl_position, cl_gl_color])
 
-    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel, 
-                  cl_start_position, cl_start_velocity, 
+    kernelargs = (cl_gl_position, cl_gl_color, cl_velocity, cl_zmel,
+                  cl_start_position, cl_start_velocity,
                   run_options)
-                  #numpy.float32(log_Emax), numpy.float32(Erange), numpy.float32(time_step))
+                  #np.float32(log_Emax), np.float32(Erange), np.float32(time_step))
 
     program.particle_prop(queue, (num_particles,), None, *(kernelargs))
     cl.enqueue_release_gl_objects(queue, [cl_gl_position, cl_gl_color])
@@ -267,7 +267,7 @@ def on_display():
     glRotatef(rotate['x'], 1, 0, 0)
     glRotatef(rotate['z'], 0, 0, 1)
     glTranslatef(translate['x'], translate['y'], translate['z'])
-    
+
     if (drawTexturedEarth):
         # Draw Earth
         global texture
@@ -291,7 +291,7 @@ def on_display():
         gluQuadricTexture(quad, True)
 
         # Rotate Earth to align with HAWC longitude
-        e_rot = 180./numpy.pi*numpy.arctan(hawcY/hawcX)
+        e_rot = 180./np.pi*np.arctan(hawcY/hawcX)
         glRotated(e_rot, 0.0, 0.0, 1.0)
 
         # Define sphere as quadric surface
@@ -303,7 +303,7 @@ def on_display():
 
         glPopMatrix()
 
-    
+
     else:
         # Draw a blue sphere
         # Draw xyz axes
@@ -335,9 +335,9 @@ def on_display():
     glDisableClientState(GL_VERTEX_ARRAY)
 
     glDisable(GL_BLEND)
-    
+
     glutSwapBuffers()
-        
+
     # NOTE: the GL_RGB / GL_RGBA difference
     if save_frames:
         global frame
@@ -365,7 +365,7 @@ def printHelp():
           Left Mouse Button:        - rotate viewing position\n
           Middle Mouse Button:      - translate the scene\n
           Right Mouse Button:       - zoom in and out of scene\n
-          
+
           Keys
             p, spacebar:            - start or pause the program\n
             q, Esc:                 - exit the program\n
@@ -393,7 +393,7 @@ if __name__=="__main__":
                         help="Geodetic longitude of starting particle position in degrees.")
     parser.add_argument("--height", dest="height", type=float, default=3,
                         help="Height of starting particle position in Earth radii. 1 is ground level.")
-    parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris', 
+    parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris',
                         help="Stepper function to integrate equations of motion. Default: boris. Options: euler, rk4, boris, adaboris")
     args = parser.parse_args()
 
@@ -402,40 +402,40 @@ if __name__=="__main__":
     num_particles = args.num_particles
     Emin = args.Emin
     Emax = args.Emax
-    log_Emax = numpy.log10(Emax)
-    Erange = numpy.log10(Emax)-numpy.log10(Emin)
+    log_Emax = np.log10(Emax)
+    Erange = np.log10(Emax)-np.log10(Emin)
     eom_integrator = eom_dict[args.eom_step.lower()]
 
-    run_options = numpy.array([time_step, log_Emax, Erange, eom_integrator], dtype=numpy.float32)
+    run_options = np.array([time_step, log_Emax, Erange, eom_integrator], dtype=np.float32)
 
     # Start a new OpenGL window
     window = glut_window()
 
     # Preload texture once
     texture = load_texture(texture_file)
-   
+
     # Initialize the necessary particle information
     (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax, alpha=args.alpha,
                                                           lat=args.lat, lon=args.lon, height=args.height)
-    
+
     # Arrays for OpenGL bindings
     gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
     gl_position.bind()
-    np_color = numpy.ndarray((num_particles, 4), dtype=numpy.float32)
+    np_color = np.ndarray((num_particles, 4), dtype=np.float32)
     gl_color = vbo.VBO(data=np_color, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)
     gl_color.bind()
 
     # Define pyopencl context and queue based on available hardware
     platform = cl.get_platforms()[0]
     dev = platform.get_devices(device_type=cl.device_type.GPU)
-    context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())  
+    context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
     queue = cl.CommandQueue(context)
-    
+
     cl_velocity = cl.Buffer(context, mf.COPY_HOST_PTR, hostbuf=np_velocity)
     cl_zmel = cl.Buffer(context, mf.COPY_HOST_PTR, hostbuf=np_zmel)
     cl_start_position = cl.Buffer(context, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=np_position)
     cl_start_velocity = cl.Buffer(context, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=np_velocity)
-   
+
     # Buffer object depends on version of PyOpenCL
     if hasattr(gl_position,'buffers'):
         cl_gl_position = cl.GLBuffer(context, mf.READ_WRITE, int(gl_position.buffers[0]))
@@ -446,7 +446,7 @@ if __name__=="__main__":
     else:
         print "Can not find a proper buffer object in pyopencl install. Exiting..."
         sys.exit()
-   
+
     # Get OpenCL code and compile the program
     f = open("%s/run_prop.cl"%cl_src_path,'r')
     fstr = "".join(f.readlines())
