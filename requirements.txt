@@ -1,7 +1,7 @@
-setuptools==36.6.0
-numpy==1.14.2
-pygame==1.9.2
-PyOpenGL==3.1.0
-Pillow==5.2.0
-pyopencl==2018.1.1
-astropy==2.0.8
+setuptools
+numpy
+pygame
+PyOpenGL
+Pillow
+pyopencl
+astropy
