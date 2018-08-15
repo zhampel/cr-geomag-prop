@@ -1,0 +1,18 @@
+# Documentation
+sphinx
+numpydoc
+sphinx_rtd_theme
+nbsphinx
+# Testing
+pytest
+pytest-cov
+flake8
+tables
+twine
+setuptools
+numpy
+pygame
+PyOpenGL
+Pillow
+pyopencl
+astropy

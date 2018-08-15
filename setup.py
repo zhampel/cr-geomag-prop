@@ -40,6 +40,8 @@ with io.open(os.path.join(here, 'crprop', '__version__.py'), encoding='utf-8') a
 
 # requirements
 INSTALL_REQUIRES = get_install_requirements(os.path.join(here, 'requirements.txt'))
+DEV_REQUIRES = get_install_requirements(os.path.join(here, 'requirements_dev.txt'))
+EXTRAS_REQUIRE = {
 
 class UploadCommand(Command):
     """Support setup.py upload."""
@@ -90,6 +92,7 @@ setup(
     packages=['crprop'],
     #packages=find_packages(),
     install_requires=INSTALL_REQUIRES, #external packages as dependencies
+    extras_require=EXTRAS_REQUIRE,
     setup_requires=['setuptools>=38.6.0'],
     scripts=[
              'crprop/run.py',
