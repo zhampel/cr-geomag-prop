@@ -1,0 +1,20 @@
+name: crprop_dev
+channels:
+  - conda-forge
+dependencies:
+  # Analysis requirements
+  - numpy
+  - pygame
+  - PyOpenGL
+  - Pillow
+  - pyopencl
+  - astropy
+  # Testing requirements
+  - pytest
+  - pytest-cov
+  - flake8
+  # Documentation requirements
+  - sphinx
+  - numpydoc
+  - sphinx_rtd_theme
+  - matplotlib

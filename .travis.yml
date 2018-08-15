@@ -1,0 +1,49 @@
+language: generic
+os: linux
+
+jobs:
+  fast_finish: true
+  include:
+    - env:
+      - PYTHON=2.7
+      - COVERAGE='false'
+      - DOCS='false'
+    - env:
+      - PYTHON=3.4
+      - COVERAGE='false'
+      - DOCS='false'
+    - env:
+      - PYTHON=3.5
+      - COVERAGE='false'
+      - DOCS='false'
+    - env:
+      - PYTHON=3.6
+      - COVERAGE='true'
+      - DOCS='true'
+    - env:
+      - PYTHON=3.6
+      - COVERAGE='false'
+      - DOCS='false'
+      os: osx
+
+install:
+    - source ci/install.sh;
+
+script:
+    - pytest --cov=crprop crprop
+    - flake8 crprop
+    - if [[ $DOCS == 'true' ]]; then source ci/build_docs.sh; fi
+
+after_success:
+    - source ci/after_success.sh
+
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: docs/_build/html
+    target_branch: gh-pages
+    email: "github-pages-deploy@travis-ci.org"
+    on:
+        branch: master
+        condition: $DOCS = 'true'
