@@ -382,6 +382,8 @@ if __name__=="__main__":
 
     global args
     parser = argparse.ArgumentParser(description="Convolutional NN Training Script")
+    parser.add_argument("-p", "--particle", dest="particle_type", default='proton',
+                        help="Particle species type. Default: proton. Options: proton, helium, carbon, oxygen, neon, magnesium, silicon, iron")
     parser.add_argument("-n", "--num_particles", dest="num_particles", default=1000, type=check_positive_int, help="Number of particles to simulate")
     parser.add_argument("-e", "--Emin", dest="Emin", default=1e7, type=check_positive_float, help="Minimum energy of particles (eV)")
     parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
@@ -398,7 +400,8 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     # Get particle parameters
-    global num_particles, Emin, Emax, log_Emax, Erange, run_options
+    global particle_type, num_particles, Emin, Emax, log_Emax, Erange, run_options
+    particle_type = args.particle_type
     num_particles = args.num_particles
     Emin = args.Emin
     Emax = args.Emax
@@ -415,7 +418,7 @@ if __name__=="__main__":
     texture = load_texture(texture_file)
 
     # Initialize the necessary particle information
-    (np_position, np_velocity, np_zmel) = initial_buffers(num_particles, Emin, Emax, alpha=args.alpha,
+    (np_position, np_velocity, np_zmel) = initial_buffers(particle_type, num_particles, Emin, Emax, alpha=args.alpha,
                                                           lat=args.lat, lon=args.lon, height=args.height)
 
     # Arrays for OpenGL bindings
@@ -444,7 +447,7 @@ if __name__=="__main__":
         cl_gl_position = cl.GLBuffer(context, mf.READ_WRITE, int(gl_position.buffer))
         cl_gl_color = cl.GLBuffer(context, mf.READ_WRITE, int(gl_color.buffer))
     else:
-        print "Can not find a proper buffer object in pyopencl install. Exiting..."
+        print("Can not find a proper buffer object in pyopencl install. Exiting...")
         sys.exit()
 
     # Get OpenCL code and compile the program

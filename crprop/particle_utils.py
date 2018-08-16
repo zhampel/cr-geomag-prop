@@ -3,6 +3,7 @@ from __future__ import absolute_import
 try:
     import os
     import sys
+    import json
     import numpy as np
     import astropy.coordinates as coords
     from astropy import units as u
@@ -13,12 +14,11 @@ except ImportError as e:
 
 np.set_printoptions(threshold=np.nan)
 
-# Particle Properties
-# Proton
-massMeV = 938.272013
-masseV = 938272013.0
-masskg = 1.67262161014e-27
-chargeC = 1.602176462e-19
+# Path to run.py script
+run_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Path to particle attributes json file
+json_pfile = os.path.join(run_dir, 'data/particle_properties.json') 
 
 # Set scale of positions and velocities
 outer_radius = 10.501
@@ -190,10 +190,29 @@ def geodetic_to_geocentric(lat, lon, height=1):
 
     return x, y, z
 
-def initial_buffers(num_particles, Emin, Emax, lat, lon, height, alpha=None):
+def load_json_file(jfile):
+    """
+    Load json file given filename
+    """
+    with open(jfile) as handle:
+        j = json.load(handle)
+
+    return j
+
+def initial_buffers(particle_type, num_particles, Emin, Emax, lat, lon, height, alpha=None):
     np_position = np.ndarray((num_particles, 4), dtype=np.float32)
     np_velocity = np.ndarray((num_particles, 4), dtype=np.float32)
     np_zmel = np.ndarray((num_particles, 4), dtype=np.float32)
+
+    # Get full particle attribute dictionary
+    full_pdict = load_json_file(json_pfile)
+
+    # Get specific species attributes
+    particle_dict = full_pdict[particle_type]
+    chargeC = particle_dict['charge']
+    masskg  = particle_dict['masskg']
+    masseV  = particle_dict['masseV']
+    print('{} properties: \n\t masseV {} \n\t masskg {} \n\t charge in C {}\n\n'.format(particle_type, masseV, masskg, chargeC))
 
     ## Test values
     if alpha:
