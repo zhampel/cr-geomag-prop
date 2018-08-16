@@ -50,9 +50,10 @@ approximation.
 # Usage
 Upon installation of required dependencies, one simply needs to run
 ```
-python crprop/run.py -n 1000 -e 1e7 -E 1e8
+python crprop/run.py -p proton -n 1000 -e 1e7 -E 1e8
 ```
-to start the simulation, where the number of particles to simulate is given by `-n`,
+to start the simulation, where `-p` defines the species to run,
+the number of particles to simulate is given by `-n`,
 and the minimum and maximum particle energy in electronvolts (eV) are given by `-e` 
 and `-E`, respectively.
 The values shown in the line above are the defaults, thus users can do a first run 
