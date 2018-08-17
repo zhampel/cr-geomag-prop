@@ -199,16 +199,27 @@ def load_json_file(jfile):
 
     return j
 
+def get_particle_props(particle_name):
+    """
+    Get specific particle species properties
+    from default json file. 
+    """
+    # Get full particle attribute dictionary
+    full_pdict = load_json_file(json_pfile)
+
+    # Get specific species attributes
+    particle_props_dict = full_pdict[particle_name]
+
+    return particle_props_dict
+    
+
 def initial_buffers(particle_type, num_particles, Emin, Emax, lat, lon, height, alpha=None):
     np_position = np.ndarray((num_particles, 4), dtype=np.float32)
     np_velocity = np.ndarray((num_particles, 4), dtype=np.float32)
     np_zmel = np.ndarray((num_particles, 4), dtype=np.float32)
 
-    # Get full particle attribute dictionary
-    full_pdict = load_json_file(json_pfile)
-
-    # Get specific species attributes
-    particle_dict = full_pdict[particle_type]
+    # Get species attributes
+    particle_dict = get_particle_props(particle_type)
     chargeC = particle_dict['charge']
     masskg  = particle_dict['masskg']
     masseV  = particle_dict['masseV']
