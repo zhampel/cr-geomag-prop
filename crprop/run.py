@@ -385,29 +385,27 @@ if __name__=="__main__":
     parser.add_argument("-p", "--particle", dest="particle_type", default='proton',
                         help="Particle species type. Default: proton. Options: proton, helium, carbon, oxygen, neon, magnesium, silicon, iron")
     parser.add_argument("-n", "--num_particles", dest="num_particles", default=1000, type=check_positive_int, help="Number of particles to simulate")
-    parser.add_argument("-e", "--Emin", dest="Emin", default=1e7, type=check_positive_float, help="Minimum energy of particles (eV)")
-    parser.add_argument("-E", "--Emax", dest="Emax", default=1e8, type=check_positive_float, help="Maximum energy of particles (eV)")
-    parser.add_argument("-a", "--alpha", dest="alpha", type=float,
+    parser.add_argument("-e", "--energy_lims", dest="energy_lims", default=[1e7, 1e8], nargs=2, type=check_positive_float, help="Minimum and maximum energy of particles (eV)")
+    parser.add_argument("-a", "--alpha", dest="alpha", type=check_positive_float,
                         help="Optional energy spectral index. If given, weight the energy distribution of events by E^-alpha.")
-    parser.add_argument("--lat", dest="lat", type=float, default=18.99,
-                        help="Geodetic latitude of starting particle position in degrees.")
-    parser.add_argument("--lon", dest="lon", type=float, default=-97.308,
-                        help="Geodetic longitude of starting particle position in degrees.")
-    parser.add_argument("--height", dest="height", type=float, default=3,
-                        help="Height of starting particle position in Earth radii. 1 is ground level.")
+    parser.add_argument("--lat_lon_alt", dest="lat_lon_alt", default=[18.99, -97.308, 3], nargs=3, type=float, help="Geodetic latitude of starting particle position in degrees, Geodetic longitude of starting particle position in degrees, Height of starting particle position in Earth radii where 1 is ground level")
     parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris',
-                        help="Stepper function to integrate equations of motion. Default: boris. Options: euler, rk4, boris, adaboris")
+                        help="Stepper function to integrate equations of motion. Options: euler, rk4, boris, adaboris. Default: boris")
     args = parser.parse_args()
 
     # Get particle parameters
     global particle_type, num_particles, Emin, Emax, log_Emax, Erange, run_options
     particle_type = args.particle_type
     num_particles = args.num_particles
-    Emin = args.Emin
-    Emax = args.Emax
+    Emin = args.energy_lims[0]
+    Emax = args.energy_lims[1]
     log_Emax = np.log10(Emax)
     Erange = np.log10(Emax)-np.log10(Emin)
     eom_integrator = eom_dict[args.eom_step.lower()]
+
+    lat = args.lat_lon_alt[0]
+    lon = args.lat_lon_alt[1]
+    alt = args.lat_lon_alt[2]
 
     run_options = np.array([time_step, log_Emax, Erange, eom_integrator], dtype=np.float32)
 
@@ -419,7 +417,7 @@ if __name__=="__main__":
 
     # Initialize the necessary particle information
     (np_position, np_velocity, np_zmel) = initial_buffers(particle_type, num_particles, Emin, Emax, alpha=args.alpha,
-                                                          lat=args.lat, lon=args.lon, height=args.height)
+                                                          lat=lat, lon=lon, height=alt)
 
     # Arrays for OpenGL bindings
     gl_position = vbo.VBO(data=np_position, usage=GL_DYNAMIC_DRAW, target=GL_ARRAY_BUFFER)

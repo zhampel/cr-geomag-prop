@@ -50,12 +50,12 @@ approximation.
 # Usage
 Upon installation of required dependencies, one simply needs to run
 ```
-python crprop/run.py -p proton -n 1000 -e 1e7 -E 1e8
+python crprop/run.py -p proton -n 1000 -e 1e7 1e8 --lat_lon_alt 18.99 -97.308 3
 ```
 to start the simulation, where `-p` defines the species to run,
 the number of particles to simulate is given by `-n`,
-and the minimum and maximum particle energy in electronvolts (eV) are given by `-e` 
-and `-E`, respectively.
+and the minimum and maximum particle energy in electronvolts (eV) are provided as a list via `-e`.
+The `--lat_lon_alt` flag allows the user to specify the particles's starting latitude and longitude in degrees, and the height above the Earth's surface in Earth radii.
 The values shown in the line above are the defaults, thus users can do a first run 
 via `python crprop/run.py`.
 
