@@ -42,6 +42,8 @@ with io.open(os.path.join(here, 'crprop', '__version__.py'), encoding='utf-8') a
 INSTALL_REQUIRES = get_install_requirements(os.path.join(here, 'requirements.txt'))
 DEV_REQUIRES = get_install_requirements(os.path.join(here, 'requirements_dev.txt'))
 EXTRAS_REQUIRE = {
+    'dev': DEV_REQUIRES,
+}
 
 class UploadCommand(Command):
     """Support setup.py upload."""

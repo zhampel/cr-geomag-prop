@@ -27,10 +27,14 @@ mf = cl.mem_flags
 
 np.set_printoptions(threshold=np.nan)
 
-# OpenGL window dimensions and perspective
+# OpenGL window dimensions and initial perspective
 width = 720
 height = 576
 zoom = 60.
+# HAWC Observatory geocentric coordinates (in Earth radii)
+hawcX = -0.1205300654
+hawcY = -0.939836962102
+hawcZ = 0.323942291206
 
 # Path to run.py script
 run_dir = os.path.dirname(os.path.realpath(__file__))
@@ -73,6 +77,7 @@ eom_dict = {'euler'   : 1,
             'adaboris' : 4}
 
 # Mouse functionality
+outer_radius = 10.501
 mouse_down = False
 mouse_old = {'x': 0., 'y': 0.}
 rotate = {'x': -55., 'y': 0., 'z': 45.}
