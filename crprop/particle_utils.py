@@ -18,7 +18,7 @@ np.set_printoptions(threshold=np.nan)
 run_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Path to particle attributes json file
-json_pfile = os.path.join(run_dir, 'data/particle_properties.json') 
+json_pfile = os.path.join(run_dir, 'data/particle_properties.json')
 
 # Set scale of positions and velocities
 outer_radius = 10.501
@@ -202,7 +202,7 @@ def load_json_file(jfile):
 def get_particle_props(particle_name):
     """
     Get specific particle species properties
-    from default json file. 
+    from default json file.
     """
     # Get full particle attribute dictionary
     full_pdict = load_json_file(json_pfile)
@@ -211,7 +211,34 @@ def get_particle_props(particle_name):
     particle_props_dict = full_pdict[particle_name]
 
     return particle_props_dict
-    
+
+def energy_distribution(Emin, Emax, num_particles, alpha=None):
+    """ Generate particle energies.  If given a spectral index 'alpha',
+        energies are randomly drawn from a power law energy spectrum.
+        Otherwise, energies are evenly distributed in logspace.
+
+        Parameters
+        ----------
+        Emin : float
+             minimum particle energy in eV
+        Emax : float
+             maximum particle energy in eV
+        num_particles : int
+             number of particles
+        alpha : float, optional
+             energy spectral index of the form E^-alpha
+
+        Returns
+        -------
+        numpy array of particle energies
+
+    """
+    if alpha:
+        E = 10**np.arange(np.log10(Emin), np.log10(Emax), 0.01)
+        weights = E**-alpha
+        return np.random.choice(E, size=num_particles, p=weights/weights.sum())
+    else:
+        return np.logspace(np.log10(Emin), np.log10(Emax), num_particles)
 
 def initial_buffers(particle_type, num_particles, Emin, Emax, lat, lon, height, alpha=None):
     np_position = np.ndarray((num_particles, 4), dtype=np.float32)
@@ -226,12 +253,7 @@ def initial_buffers(particle_type, num_particles, Emin, Emax, lat, lon, height, 
     print('{} properties: \n\t masseV {} \n\t masskg {} \n\t charge in C {}\n\n'.format(particle_type, masseV, masskg, chargeC))
 
     ## Test values
-    if alpha:
-        E = 10**np.arange(np.log10(Emin), np.log10(Emax), 0.01)
-        weights = E**-alpha
-        Energy_array = np.random.choice(E, size=num_particles, p=weights/weights.sum())
-    else:
-        Energy_array = np.logspace(np.log10(Emin), np.log10(Emax), num_particles)
+    Energy_array = energy_distribution(Emin, Emax, num_particles, alpha=alpha)
     Gamma_array = Energy_array/masseV+1.
     np_zmel[:,0] = chargeC
     np_zmel[:,1] = masskg
