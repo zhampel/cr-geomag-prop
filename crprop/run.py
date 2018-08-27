@@ -429,7 +429,6 @@ if __name__=="__main__":
     num_particles = args.num_particles
     Emin = args.energy_lims[0]
     Emax = args.energy_lims[1]
-    print(Emax)
     log_Emax = np.log10(Emax)
     Erange = np.log10(Emax)-np.log10(Emin)
     eom_integrator = eom_dict[args.eom_step.lower()]
