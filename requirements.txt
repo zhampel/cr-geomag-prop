@@ -5,3 +5,4 @@ PyOpenGL
 Pillow
 pyopencl
 astropy
+pyyaml
