@@ -1,0 +1,30 @@
+# The default arguments for the run.py script.
+args:
+    # The particle type.
+    # Options: proton, helium, carbon, oxygen, neon, magnesium, silicon, iron
+    # Default: proton.
+    particle_type: 'proton'
+
+    # The number of particles to simulate. Default: 1000.
+    num_particles: 1000
+
+    # The minimum and maximum energy bounds for the simulated particles.
+    energy_lims: [10000000, 100000000]
+
+    # If given, weight the energy distribution of events by E^-alpha.
+    # Default is None, which will evenly distribute events in log10(E).
+    # alpha: 2.0
+
+    # [lat, lon, alt], where:
+    # lat: Geodetic latitude of starting particle position in degrees.
+    # lon: Geodetic longitude of starting particle position in degrees.
+    # alt: Height of starting particle position in Earth radii,
+    #      where 1 is ground level.
+    # Default is the location of the HAWC observatory,
+    # with an altitude of 3 Earth radii.
+    lat_lon_alt: [18.99, -97.308, 3]
+
+    # Stepper function to integrate equations of motion.
+    # Options: euler, rk4, boris, adaboris.
+    # Default: boris.
+    eom_step: 'boris'

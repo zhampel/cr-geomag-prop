@@ -5,6 +5,7 @@ try:
     import sys
     import numpy as np
     import argparse
+    import yaml
     from particle_utils import *
 
     import pygame
@@ -386,17 +387,41 @@ def printHelp():
 if __name__=="__main__":
 
     global args
-    parser = argparse.ArgumentParser(description="Convolutional NN Training Script")
-    parser.add_argument("-p", "--particle", dest="particle_type", default='proton',
-                        help="Particle species type. Default: proton. Options: proton, helium, carbon, oxygen, neon, magnesium, silicon, iron")
-    parser.add_argument("-n", "--num_particles", dest="num_particles", default=1000, type=check_positive_int, help="Number of particles to simulate")
-    parser.add_argument("-e", "--energy_lims", dest="energy_lims", default=[1e7, 1e8], nargs=2, type=check_positive_float, help="Minimum and maximum energy of particles (eV)")
-    parser.add_argument("-a", "--alpha", dest="alpha", type=check_positive_float,
-                        help="Optional energy spectral index. If given, weight the energy distribution of events by E^-alpha.")
-    parser.add_argument("--lat_lon_alt", dest="lat_lon_alt", default=[18.99, -97.308, 3], nargs=3, type=float, help="Geodetic latitude of starting particle position in degrees, Geodetic longitude of starting particle position in degrees, Height of starting particle position in Earth radii where 1 is ground level")
-    parser.add_argument("-s", "--eom_step", dest="eom_step", default='boris',
-                        help="Stepper function to integrate equations of motion. Options: euler, rk4, boris, adaboris. Default: boris")
-    args = parser.parse_args()
+    p = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                description=("Launch a simulation of particles "
+                                             "propagating in the geomagnetic field."))
+    p.add_argument("-p", "--particle", dest="particle_type", default="proton",
+                   help=("Particle species type. Options: proton, helium, "
+                         "carbon, oxygen, neon, magnesium, silicon, iron."))
+    p.add_argument("-n", "--num_particles", dest="num_particles", default=1000,
+                   type=check_positive_int,
+                   help="Number of particles to simulate.")
+    p.add_argument("-e", "--energy_lims", dest="energy_lims", nargs=2,
+                   default=[1e7, 1e8], type=check_positive_float,
+                   help="Minimum and maximum energy of particles (eV). ")
+    p.add_argument("-a", "--alpha", dest="alpha", type=check_positive_float,
+                   help=("Optional energy spectral index. "
+                         "If given, weight the energy distribution of events by E^-alpha."))
+    p.add_argument("--lat_lon_alt", dest="lat_lon_alt",
+                   nargs=3, type=float, default=[18.99, -97.308, 3],
+                   help=("Geodetic latitude of starting particle position in degrees, "
+                         "Geodetic longitude of starting particle position in degrees, "
+                         "Height of starting particle position in Earth radii where 1 is ground level."))
+    p.add_argument("-s", "--eom_step", dest="eom_step", default="boris",
+                   help=("Stepper function to integrate equations of motion. "
+                         "Options: boris, adaboris, euler, rk4."))
+    args = p.parse_args()
+    args_dict = vars(args)
+
+    with open("config.yml", 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+
+    for arg in cfg["args"]:
+        if arg not in args_dict:
+            raise ValueError(("'{}' specified in the config file "
+                              "is an invalid argument!".format(arg)))
+        else:
+            args_dict[arg] = cfg["args"][arg]
 
     # Get particle parameters
     global particle_type, num_particles, Emin, Emax, log_Emax, Erange, run_options
