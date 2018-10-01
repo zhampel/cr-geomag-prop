@@ -66,7 +66,10 @@ __kernel void particle_prop(__global float4* position,
 
     // Scale dir vector to speed
     float gamma = zmel[gid].w;
-    float speed = sqrt(1.-1./(gamma*gamma))*speed_of_light;
+    // Apple CL compiler fix
+    float gamma2 = gamma*gamma;
+    float sqrt_arg = 1.-1./gamma2;
+    float speed = sqrt(sqrt_arg)*speed_of_light;
     v = vec_normalize(v);
     v = vec_scale(speed,v);
 

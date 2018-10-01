@@ -182,8 +182,9 @@ static void PropStepAdaptBoris(float dt, struct particle_struct *particle, struc
     //float4 B = GetUniformField();
     float Bmag = B.w;
 
-    float dt_theta = 2.*mass*tan(0.5*THETA_MIN)/(Z*Bmag*inv_gamman);
-    //float dt_theta = 2.*mass*tan(0.5*THETA_MIN)/(Z*Bmag);
+    float tan_arg = 0.5 * THETA_MIN;
+    float dt_theta = 2.*mass*tan(tan_arg)/(Z*Bmag*inv_gamman);
+    //float dt_theta = 2.*mass*tan(tan_arg)/(Z*Bmag);
     dt = MIN(dt_theta,dt); 
 
     float q = 0.5*Z*dt*inv_gamman/mass;

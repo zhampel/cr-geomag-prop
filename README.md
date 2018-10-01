@@ -94,6 +94,31 @@ One must have ffmpeg installed on the system to make the movie.
 ## Installation of Required Software
 Personally, I've only successfully run using Python2.7, testing on Python3.0 is forthcoming.
 The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
+depending on the platform, but on my Linux machines, I've had success via `make install` 
+or `pip install -r requirements.txt`.
+
+### Mac
+On my MacBook Pro, I've instead been able to get things running via the following steps:
+
+- `brew install freeglut`
+- Start a new virtual-env
+- `pip install setuptools numpy pygame PyOpenGL Pillow astropy pyyaml pybind11`
+- Download PyOpenGL and PyOpenGL-accelerate from [here](http://pyopengl.sourceforge.net/documentation/installation.html)
+- Untar each, then `python setup.py install` PyOpenGL, then PyOpenGL-accelerate
+- You can test the PyOpenGL installation with the PyOpenGL-Demo package, also found at the PyOpenGL site
+- Download PyOpenCL from [here](https://pypi.org/project/pyopencl/), for example
+- Build with specific Python paths and gl-interoperability:</br>
+`./configure.py --python-exe=PATH_TO_PYTHON_EXE --prefix=PATH_TO_PREFIX --enable-shared --cl-enable-gl`
+- `make && make install`
+
+To test the installation, one can the PyOpenCL particle [example script](https://github.com/inducer/pyopencl/tree/master/examples/gl_particle_animation.py)
+
+One can also go to Andreas Kloeckner's
+[site](https://documen.tician.de/pyopencl/) for even more details regarding PyOpenCL installation and documentation.
+
+
+### IGNORE BELOW
+The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
 depending on the platform, but may be done via `make install` or `pip install -r requirements.txt`.
 If this doesn't work, the best resource for preparing the PyOpenCL installation can
 be found at Andreas Klockner's [website](https://wiki.tiker.net/PyOpenCL/Installation/).

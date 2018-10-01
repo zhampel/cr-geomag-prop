@@ -136,6 +136,9 @@ static float4 igrf(float4 p, struct igrf_struct *coeff_struct)
     Bsph.y = 0;
     Bsph.z = 0;
 
+    // Apple CL compiler fix
+    float pow_float = 0.;
+
     //Avoid Pole Singularities
     theta = MAX(theta,0.0001);
     theta = MIN(theta,PI-.00001);
@@ -194,7 +197,8 @@ static float4 igrf(float4 p, struct igrf_struct *coeff_struct)
                     dP10 = dP2;
                 }
 
-                rpow = pow(1./r,n+2);
+                pow_float = (float)n+2.; // Apple CL compiler fix
+                rpow = pow(1./r, pow_float);
                 c_mp = cos(phi*m_float);
                 s_mp = sin(phi*m_float);
                 gl = coeff_struct->gLocal[n-1][m];

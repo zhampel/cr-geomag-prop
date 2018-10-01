@@ -483,8 +483,9 @@ if __name__=="__main__":
     fstr = "".join(f.readlines())
     program = cl.Program(context, fstr)
 
+    opts_string = "-I %s"%cl_src_path
     try:
-        program.build(options=['-I %s'%cl_src_path], cache_dir=None)
+        program.build(options=opts_string, cache_dir=None)
     except:
         print('Build log:')
         print(program.get_build_info(dev[0], cl.program_build_info.LOG))
