@@ -102,7 +102,7 @@ On my MacBook Pro, I've instead been able to get things running via the followin
 
 - `brew install freeglut`
 - Start a new virtual-env
-- `pip install setuptools numpy pygame PyOpenGL Pillow astropy pyyaml pybind11`
+- `pip install setuptools numpy pygame Pillow astropy pyyaml pybind11`
 - Download PyOpenGL and PyOpenGL-accelerate from [here](http://pyopengl.sourceforge.net/documentation/installation.html)
 - Untar each, then `python setup.py install` PyOpenGL, then PyOpenGL-accelerate
 - You can test the PyOpenGL installation with the PyOpenGL-Demo package, also found at the PyOpenGL site
