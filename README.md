@@ -100,6 +100,7 @@ or `pip install -r requirements.txt`.
 ### Mac
 On my MacBook Pro, I've instead been able to get things running via the following steps:
 
+- Install Python2.7 via Homebrew `brew install python`
 - `brew install freeglut`
 - Start a new virtual-env
 - `pip install setuptools numpy pygame Pillow astropy pyyaml pybind11`

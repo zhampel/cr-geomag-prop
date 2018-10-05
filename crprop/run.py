@@ -344,6 +344,8 @@ def on_display():
 
     glutSwapBuffers()
 
+    # Inspired by the 'render.py` script from 
+    # https://groups.google.com/forum/#!topic/pygame-mirror-on-google-groups/qdFuQh8RY4g
     # NOTE: the GL_RGB / GL_RGBA difference
     if save_frames:
         global frame
