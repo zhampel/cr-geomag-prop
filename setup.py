@@ -10,7 +10,7 @@ from setuptools import setup, find_packages, Command
 NAME = 'crprop'
 DESCRIPTION = 'A tool for visualizing cosmic rays propagating through the geomagnetic field',
 MAINTAINER = 'Zigfried Hampel-Arias'
-MAINTAINER_EMAIL = 'zhampel@gmail.com'
+MAINTAINER_EMAIL = 'zhampel.github@gmail.com'
 URL = 'https://github.com/zhampel/cr-geomag-prop'
 LICENSE = 'MIT'
 
