@@ -412,18 +412,26 @@ if __name__=="__main__":
     p.add_argument("-s", "--eom_step", dest="eom_step", default="boris",
                    help=("Stepper function to integrate equations of motion. "
                          "Options: boris, adaboris, euler, rk4."))
+
+    # Use of a config file for all options 
+    config_parse = p.add_mutually_exclusive_group()
+    config_parse.add_argument("-c", "--config", dest="config_file", default='crprop/config.yml', help="Path to yaml configuration file")
+
     args = p.parse_args()
     args_dict = vars(args)
 
-    with open("config.yml", 'r') as ymlfile:
-        cfg = yaml.load(ymlfile)
+    # Check if config file
+    if args.config_file is not None:
+        config_file = args.config_file
+        with open(config_file, 'r') as ymlfile:
+            cfg = yaml.load(ymlfile)
 
-    for arg in cfg["args"]:
-        if arg not in args_dict:
-            raise ValueError(("'{}' specified in the config file "
-                              "is an invalid argument!".format(arg)))
-        else:
-            args_dict[arg] = cfg["args"][arg]
+        for arg in cfg["args"]:
+            if arg not in args_dict:
+                raise ValueError(("'{}' specified in the config file "
+                                  "is an invalid argument!".format(arg)))
+            else:
+                args_dict[arg] = cfg["args"][arg]
 
     # Get particle parameters
     global particle_type, num_particles, Emin, Emax, log_Emax, Erange, run_options

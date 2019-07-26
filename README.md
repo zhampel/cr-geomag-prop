@@ -64,6 +64,11 @@ and the height above the Earth's surface in Earth radii.
 Finally, the `-s` option allows the user to choose the equation of motion integrator.
 The values shown in the line above are the defaults, thus users can do a first run simply
 via `python crprop/run.py`.
+Users can also use a YAML config file to input all options and run via
+```
+python crprop/run.py -c config.yml
+```
+with a default configuration file provided in the `crprops` directory.
 
 ## Visualization
 Once the window opens, one can also use various mouse operations to change the scene.
