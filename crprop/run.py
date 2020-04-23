@@ -26,7 +26,7 @@ except ImportError as e:
 # PyOpenCL memory flags
 mf = cl.mem_flags
 
-np.set_printoptions(threshold=np.nan)
+np.set_printoptions(threshold=sys.maxsize)
 
 # OpenGL window dimensions and initial perspective
 width = 720
@@ -368,7 +368,7 @@ def png_file_write(name, number, data):
 
 
 def printHelp():
-    print """\n\n
+    print("""\n\n
           ------------------------------------------------------------------------------\n
           Left Mouse Button:        - rotate viewing position\n
           Middle Mouse Button:      - translate the scene\n
@@ -381,7 +381,7 @@ def printHelp():
             s:                      - save frames to file (default is no save)\n
             t:                      - toggle between a textured Earth and a simple sphere\n
           ------------------------------------------------------------------------------\n
-          \n"""
+          \n""")
 
 #-----
 # MAIN

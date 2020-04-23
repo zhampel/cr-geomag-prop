@@ -11,7 +11,7 @@ except ImportError as e:
     print(e)
     raise ImportError
 
-np.set_printoptions(threshold=np.nan)
+np.set_printoptions(threshold=sys.maxsize)
 
 def rotation_matrix(axis, theta):
     """
