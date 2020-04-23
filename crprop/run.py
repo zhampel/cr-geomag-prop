@@ -420,8 +420,13 @@ if __name__=="__main__":
     args = p.parse_args()
     args_dict = vars(args)
 
-    # Check if config file
-    if args.config_file is not None:
+    # If no specified input, use default config file
+    if not any((args.particle_type, 
+                args.num_particles,
+                args.energy_lims, 
+                args.alpha, 
+                args.lat_lon_alt, 
+                args.eom_step)):
         config_file = args.config_file
         with open(config_file, 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
