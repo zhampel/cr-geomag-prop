@@ -6,7 +6,9 @@ try:
     import numpy as np
     import argparse
     import yaml
+    from definitions import *
     from particle_utils import *
+    from extras import printText, printHelp
 
     import pygame
     from pygame.locals import *
@@ -32,37 +34,25 @@ np.set_printoptions(threshold=sys.maxsize)
 width = 720
 height = 576
 zoom = 60.
-# HAWC Observatory geocentric coordinates (in Earth radii)
-hawcX = -0.1205300654
-hawcY = -0.939836962102
-hawcZ = 0.323942291206
+display_scale_factor = 2 # must be integer
+isBigDisplay = False
 
-# Path to run.py script
-run_dir = os.path.dirname(os.path.realpath(__file__))
+# Boolean for printing info message
+drawInfoMessage = True
 
 # Boolean to draw a textured Earth
 drawTexturedEarth = True
-texture_dir = os.path.join(run_dir, 'textures')
-texture_file = os.path.join(texture_dir, 'earthmap1k.jpg')
+texture_file = os.path.join(TEXTURE_DIR, 'earthmap1k.jpg')
 
 # Path to output frame pngs
-frame_output_dir = os.path.join(run_dir, 'frames')
-frame_prefix = os.path.join(frame_output_dir, 'particle')
-
-# OpenCL source code directory
-cl_src_path = os.path.join(run_dir, 'cl_src')
+frame_prefix = os.path.join(FRAME_OUTPUT_DIR, 'particle')
 
 # Whether to save frames to pngs
 save_frames = False
+frame = 0
 
 # Continuously rotate perspective
 rotate_perspective = False
-
-# size of final render
-w = width
-h = height
-
-frame = 0
 
 # Set the time step and pause functionality
 time_step = 0.0005
@@ -142,12 +132,26 @@ def on_timer(t):
 
 def on_key(*args):
     global drawTexturedEarth
+    global drawInfoMessage
     global rotate_perspective
-    global save_frames, time_step, run_options
+    global width, height, isBigDisplay
+    global save_frames, time_step, time_pause_var, run_options
 
     # Pause and restart
     if args[0] == b' ' or args[0] == b'p':
         time_step = time_pause_var-time_step
+        run_options[0] = time_step
+
+    # Speed up by 10 percent
+    if args[0] == b'+':
+        time_step += 0.1*time_step
+        time_pause_var = time_step
+        run_options[0] = time_step
+
+    # Slow down by 10 percent
+    if args[0] == b'-':
+        time_step -= 0.1*time_step
+        time_pause_var = time_step
         run_options[0] = time_step
 
     # Rotate vieweing perspective
@@ -157,12 +161,26 @@ def on_key(*args):
     # Save frames to file
     if args[0] == b's':
         save_frames = not save_frames
-        if not os.path.exists(frame_output_dir):
-            os.makedirs(frame_output_dir)
+        if not os.path.exists(FRAME_OUTPUT_DIR):
+            os.makedirs(FRAME_OUTPUT_DIR)
 
     # Toggle textured Earth and simple sphere
     if args[0] == b't':
         drawTexturedEarth = not drawTexturedEarth
+    
+    # Toggle printing info message on screen
+    if args[0] == b'i':
+        drawInfoMessage = not drawInfoMessage
+    
+    # Quickly toggle large and small display sizes
+    if args[0] == b'b':
+        if isBigDisplay:
+            width /= display_scale_factor
+            height /= display_scale_factor
+        else:
+            width *= display_scale_factor
+            height *= display_scale_factor
+        isBigDisplay = not isBigDisplay
 
     # Exit program
     if args[0] == b'\033' or args[0] == b'q':
@@ -237,6 +255,21 @@ def threeAxis(length):
     glPopMatrix()
 
 
+def glut_print(text, x, y):
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0)
+    glMatrixMode(GL_MODELVIEW)
+
+    glColor3f(1, 1, 1)
+    glRasterPos2f(x, y)
+    for ch in text:
+        glutBitmapCharacter(OpenGL.GLUT.GLUT_BITMAP_HELVETICA_10, ctypes.c_int(ord(ch)))
+        #glutBitmapCharacter(OpenGL.GLUT.GLUT_BITMAP_TIMES_ROMAN_24, ctypes.c_int(ord(ch)))
+        #glutBitmapCharacter(OpenGL.GLUT.GLUT_BITMAP_9_BY_15, ctypes.c_int(ord(ch)))
+
+
 def on_display():
 
     # Rotate camera
@@ -297,7 +330,7 @@ def on_display():
         gluQuadricTexture(quad, True)
 
         # Rotate Earth to align with HAWC longitude
-        e_rot = 180./np.pi*np.arctan(hawcY/hawcX)
+        e_rot = 180./np.pi*np.arctan(HAWCY/HAWCX)
         glRotated(e_rot, 0.0, 0.0, 1.0)
 
         # Define sphere as quadric surface
@@ -342,6 +375,15 @@ def on_display():
 
     glDisable(GL_BLEND)
 
+    # Info message on screen
+    textx = 0.05
+    texty = 0.99
+    texty_delta = 0.0115
+    if drawInfoMessage:
+        for lineno in range(21):
+            texty -= texty_delta
+            glut_print(printText(lineno=lineno), textx, texty)
+
     glutSwapBuffers()
 
     # Inspired by the 'render.py` script from 
@@ -351,7 +393,6 @@ def on_display():
         global frame
         png_file_write(frame_prefix, frame, glReadPixels( 0,0, w, h, GL_RGBA, GL_UNSIGNED_BYTE))
         frame += 1
-
 
 
 #######################################################################################
@@ -364,24 +405,6 @@ def png_file_write(name, number, data):
     im.save(name + fnumber + ".png")
 
 ######################################################################################
-
-
-
-def printHelp():
-    print("""\n\n
-          ------------------------------------------------------------------------------\n
-          Left Mouse Button:        - rotate viewing position\n
-          Middle Mouse Button:      - translate the scene\n
-          Right Mouse Button:       - zoom in and out of scene\n
-
-          Keys
-            p, spacebar:            - start or pause the program\n
-            q, Esc:                 - exit the program\n
-            r:                      - start/stop rotation of viewing perspective\n
-            s:                      - save frames to file (default is no save)\n
-            t:                      - toggle between a textured Earth and a simple sphere\n
-          ------------------------------------------------------------------------------\n
-          \n""")
 
 #-----
 # MAIN
@@ -483,10 +506,10 @@ if __name__=="__main__":
     cl_start_velocity = cl.Buffer(context, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=np_velocity)
 
     # Buffer object depends on version of PyOpenCL
-    if hasattr(gl_position,'buffers'):
+    if hasattr(gl_position, 'buffers'):
         cl_gl_position = cl.GLBuffer(context, mf.READ_WRITE, int(gl_position.buffers[0]))
         cl_gl_color = cl.GLBuffer(context, mf.READ_WRITE, int(gl_color.buffers[0]))
-    elif hasattr(gl_position,'buffer'):
+    elif hasattr(gl_position, 'buffer'):
         cl_gl_position = cl.GLBuffer(context, mf.READ_WRITE, int(gl_position.buffer))
         cl_gl_color = cl.GLBuffer(context, mf.READ_WRITE, int(gl_color.buffer))
     else:
@@ -494,11 +517,12 @@ if __name__=="__main__":
         sys.exit()
 
     # Get OpenCL code and compile the program
-    f = open("%s/run_prop.cl"%cl_src_path,'r')
+    cl_src_code = os.path.join(CL_SRC_PATH, 'run_prop.cl')
+    f = open(cl_src_code, 'r')#%cl_src_path,'r')
     fstr = "".join(f.readlines())
     program = cl.Program(context, fstr)
 
-    opts_string = "-I %s"%cl_src_path
+    opts_string = "-I %s"%CL_SRC_PATH
     try:
         program.build(options=opts_string, cache_dir=None)
     except:
