@@ -97,7 +97,7 @@ One must have ffmpeg installed on the system to make the movie.
 
 
 ## Installation of Required Software
-Personally, I've only successfully run using Python2.7, testing on Python3.0 is forthcoming.
+I've successfully run using Python2.7 and on Python3.7.5.
 The installation of PyOpenCL and PyOpenGL potentially can be a bit tricky
 depending on the platform, but on my Linux machines, I've had success via `make install` 
 or `pip install -r requirements.txt`.
@@ -105,15 +105,15 @@ or `pip install -r requirements.txt`.
 ### Mac
 On my MacBook Pro, I've instead been able to get things running via the following steps:
 
-- Install Python2.7 via Homebrew `brew install python`
+- Ensure Python3 accessible, e.g. in `/usr/local/bin/python3`
 - `brew install freeglut`
-- Start a new virtual-env
+- Start a new virtual-env: `virtualenv -p /usr/local/bin/python3 venv`
 - `pip install setuptools numpy pygame Pillow astropy pyyaml pybind11`
 - Download PyOpenGL and PyOpenGL-accelerate from [here](http://pyopengl.sourceforge.net/documentation/installation.html)
 - Untar each, then `python setup.py install` PyOpenGL, then PyOpenGL-accelerate
 - You can test the PyOpenGL installation with the PyOpenGL-Demo package, also found at the PyOpenGL site
 - Download PyOpenCL from [here](https://pypi.org/project/pyopencl/), for example
-- Build with specific Python paths and gl-interoperability:</br>
+- Build with specific Python paths and gl-interoperability (though I have found =paths unnecessary to specify explicitly...):</br>
 `./configure.py --python-exe=PATH_TO_PYTHON_EXE --prefix=PATH_TO_PREFIX --enable-shared --cl-enable-gl`
 - `make && make install`
 
