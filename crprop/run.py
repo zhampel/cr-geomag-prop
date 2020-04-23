@@ -146,26 +146,26 @@ def on_key(*args):
     global save_frames, time_step, run_options
 
     # Pause and restart
-    if args[0] == ' ' or args[0] == 'p':
+    if args[0] == b' ' or args[0] == b'p':
         time_step = time_pause_var-time_step
         run_options[0] = time_step
 
     # Rotate vieweing perspective
-    if args[0] == 'r':
+    if args[0] == b'r':
         rotate_perspective = not rotate_perspective
 
     # Save frames to file
-    if args[0] == 's':
+    if args[0] == b's':
         save_frames = not save_frames
         if not os.path.exists(frame_output_dir):
             os.makedirs(frame_output_dir)
 
     # Toggle textured Earth and simple sphere
-    if args[0] == 't':
+    if args[0] == b't':
         drawTexturedEarth = not drawTexturedEarth
 
     # Exit program
-    if args[0] == '\033' or args[0] == 'q':
+    if args[0] == b'\033' or args[0] == b'q':
         sys.exit()
 
 def mouse(button, state, x, z):
