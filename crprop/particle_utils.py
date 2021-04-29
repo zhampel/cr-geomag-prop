@@ -20,7 +20,22 @@ run_dir = os.path.dirname(os.path.realpath(__file__))
 json_pfile = os.path.join(run_dir, 'data/particle_properties.json')
 
 # Cos ( Lowest Zenith )
+#cosThetaMin = 1
 cosThetaMin = -1.
+
+
+# Value checks for initialization
+def check_positive_int(value):
+    ivalue = int(value)
+    if ivalue <= 0:
+         raise argparse.ArgumentTypeError("%s is an invalid positive int value" % value)
+    return ivalue
+
+def check_positive_float(value):
+    ivalue = float(value)
+    if ivalue <= 0:
+         raise argparse.ArgumentTypeError("%s is an invalid positive float value" % value)
+    return ivalue
 
 
 def load_json_file(jfile):
