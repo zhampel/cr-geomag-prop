@@ -28,3 +28,6 @@ args:
     # Options: euler, rk4, boris, adaboris.
     # Default: boris.
     eom_step: 'boris'
+
+    # CPU device specification (CPU == True, GPU == False)
+    device: False
