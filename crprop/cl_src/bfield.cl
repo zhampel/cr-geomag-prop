@@ -128,7 +128,8 @@ static float4 igrf(float4 p, struct igrf_struct *coeff_struct)
     // Position vector in spherical coordinates
     float r = vec_three_Mag(p)/E_r_m;
     float phi = atan2(p.y,p.x);
-    float theta = acos(p.z/(r*E_r_m));;
+    float theta = acos(p.z/(r*E_r_m));
+    float inv_r;
 
     // Hard set Bsph to zero, avoiding potential zero_vec issues
     float4 Bsph;
@@ -198,7 +199,9 @@ static float4 igrf(float4 p, struct igrf_struct *coeff_struct)
                 }
 
                 pow_float = (float)n+2.; // Apple CL compiler fix
-                rpow = pow(1./r, pow_float);
+                inv_r = 1./r;
+                rpow = pow(inv_r, pow_float);
+                //rpow = pow(1./(float)r, pow_float);
                 c_mp = cos(phi*m_float);
                 s_mp = sin(phi*m_float);
                 gl = coeff_struct->gLocal[n-1][m];
