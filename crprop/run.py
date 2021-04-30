@@ -45,11 +45,39 @@ frame = 0
 rotate_perspective = False
 
 # Dictionary for choosing EOM integrators
-eom_dict = {'euler'   : 1,
+eom_dict = {'euler'    : 1,
             'rk4'      : 2,
             'boris'    : 3,
             'adaboris' : 4}
 
+
+# Dictionary for grabbing available devices
+deviceDict = {'gpu' : cl.device_type.GPU,
+              'cpu' : cl.device_type.CPU}
+
+# Define pyopencl context and queue based on available hardware
+def init_device(cpu_device=False):
+    # Find a device... default is for GPU
+    device_type_name = 'gpu'
+    if cpu_device:
+        device_type_name = 'cpu'
+
+    # Grab OpenCL device calls
+    device_type = deviceDict[device_type_name]
+
+    print('\n============== Grabbing Compute Resources =============\n')
+    platform = cl.get_platforms()[0]
+    print('\t\tPlatform: %s'%platform)
+    device = platform.get_devices(device_type=device_type)
+    print('\t\tDevice: %s'%device[0])
+    print('\n=======================================================\n')
+    #platform = cl.get_platforms()[0]
+    #dev = platform.get_devices(device_type=cl.device_type.GPU)
+    #context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
+    context = cl.Context(devices=device,
+                         properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
+    return device, context
+    #return [device], context
 
 def glut_window():
 
@@ -296,6 +324,7 @@ if __name__=="__main__":
     p.add_argument("-s", "--eom_step", dest="eom_step", default="boris",
                    help=("Stepper function to integrate equations of motion. "
                          "Options: boris, adaboris, euler, rk4."))
+    p.add_argument("-d", "--cpu", dest="device", help='Flag to run on CPU', action='store_true')
 
     # Use of a config file for all options 
     config_parse = p.add_mutually_exclusive_group()
@@ -310,7 +339,8 @@ if __name__=="__main__":
                 args.energy_lims, 
                 args.alpha, 
                 args.lat_lon_alt, 
-                args.eom_step)):
+                args.eom_step,
+                args.device)):
         config_file = args.config_file
         with open(config_file, 'r') as ymlfile:
             cfg = yaml.load(ymlfile)
@@ -324,6 +354,7 @@ if __name__=="__main__":
 
     # Get particle parameters
     global particle_type, num_particles, Emin, Emax, log_Emax, Erange, run_options
+    cpu_device_flag = args.device
     particle_type = args.particle_type
     num_particles = args.num_particles
     Emin = args.energy_lims[0]
@@ -356,9 +387,10 @@ if __name__=="__main__":
     gl_color.bind()
 
     # Define pyopencl context and queue based on available hardware
-    platform = cl.get_platforms()[0]
-    dev = platform.get_devices(device_type=cl.device_type.GPU)
-    context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
+    #platform = cl.get_platforms()[0]
+    #dev = platform.get_devices(device_type=cl.device_type.GPU)
+    #context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
+    dev, context = init_device(cpu_device=cpu_device_flag)
     queue = cl.CommandQueue(context)
 
     cl_velocity = cl.Buffer(context, mf.COPY_HOST_PTR, hostbuf=np_velocity)
