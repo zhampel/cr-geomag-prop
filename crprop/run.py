@@ -71,13 +71,9 @@ def init_device(cpu_device=False):
     device = platform.get_devices(device_type=device_type)
     print('\t\tDevice: %s'%device[0])
     print('\n=======================================================\n')
-    #platform = cl.get_platforms()[0]
-    #dev = platform.get_devices(device_type=cl.device_type.GPU)
-    #context = cl.Context(properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
     context = cl.Context(devices=device,
                          properties=[(cl.context_properties.PLATFORM, platform)] + get_gl_sharing_context_properties())
     return device, context
-    #return [device], context
 
 def glut_window():
 
